@@ -33,7 +33,7 @@ public class Cliente {
 
     // Setters com validação
     public void setNome(String nome) {
-        if (nome.isEmpty()){
+        if (!nome.isEmpty()){
         this.nome = nome;}
         else {this.nome = "Fantasma";}
     }
