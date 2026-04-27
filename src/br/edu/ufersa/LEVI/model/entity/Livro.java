@@ -138,4 +138,8 @@ public class Livro {
             this.valorAluguel = 0;
         }
     }
+
+    public String getGenero() {
+        return genero;
+    }
 }
