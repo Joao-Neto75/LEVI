@@ -2,6 +2,8 @@ package br.edu.ufersa.LEVI.model.entity;
 
 import java.util.ArrayList; // Faltava esse import
 import java.util.List;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 public class Aluguel {
     private Cliente cliente;
@@ -78,4 +80,7 @@ public class Aluguel {
         this.discosAlugados.add(disco);
         this.calcularValorTotal();
     }
+
+    public LocalDate getDataAluguel() {
+    return LocalDate.parse(this.dataEmprestimo);
 }

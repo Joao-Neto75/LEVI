@@ -114,6 +114,8 @@ public class Sistema {
         System.out.println("ERRO: Não foi possível localizar o disco " + titulo + " para exclusão.");
     }
 
+
+    //pesquisas
     public List<Livro> pesquisarLivroPorTitulo(String titulo) {
         List<Livro> resultados = new ArrayList<>();
         for (Livro l : livros) {
@@ -133,5 +135,111 @@ public class Sistema {
         }
         return resultados;
     }
+
+    public List<Livro> pesquisarLivroPorAutor(String autor) {
+        List<Livro> resultados = new ArrayList<>();
+        for (Livro l : livros) {
+            if (l.getAutor().toLowerCase().contains(autor.toLowerCase())) {
+                resultados.add(l);
+            }
+        }
+        return resultados;
+    }
+
+    public List<Livro> pesquisarLivroPorAno(int ano) {
+        List<Livro> resultados = new ArrayList<>();
+        for (Livro l : livros) {
+            if (l.getAno() == ano) {
+                resultados.add(l);
+            }
+        }
+        return resultados;
+    }
+
+    public List<Disco> pesquisarDiscoPorTitulo(String titulo) {
+        List<Disco> resultados = new ArrayList<>();
+        for (Disco d : discos) {
+            if (d.getTitulo().toLowerCase().contains(titulo.toLowerCase())) {
+                resultados.add(d);
+            }
+        }
+        return resultados;
+    }
+
+    public List<Disco> pesquisarDiscoPorBanda(String banda) {
+        List<Disco> resultados = new ArrayList<>();
+        for (Disco d : discos) {
+            if (d.getBanda().toLowerCase().contains(banda.toLowerCase())) {
+                resultados.add(d);
+            }
+        }
+        return resultados;
+    }
+
+    public List<Disco> pesquisarDiscoPorEstilo(String estilo) {
+        List<Disco> resultados = new ArrayList<>();
+        for (Disco d : discos) {
+            if (d.getEstilo().equalsIgnoreCase(estilo)) {
+                resultados.add(d);
+            }
+        }
+        return resultados;
+    }
+
+    public List<Cliente> pesquisarClientePorNome(String nome) {
+        List<Cliente> resultados = new ArrayList<>();
+        for (Cliente c : clientes) {
+            if (c.getNome().toLowerCase().contains(nome.toLowerCase())) {
+                resultados.add(c);
+            }
+        }
+        return resultados;
+    }
+
+    public Cliente pesquisarClientePorCpf(String cpf) {
+        List<Cliente> resultados = new ArrayList<>();
+        for (Cliente c : clientes) {
+            if (c.getCpf().equals(cpf)) {
+                resultados.add(c);
+            }
+        }
+        return resultados;
+    }
+
+    public void registrarAluguel(Aluguel a) {
+        if (a != null) {
+            this.alugueis.add(a);
+            System.out.println("Aluguel registrado com sucesso!");
+        }else {
+            System.out.println("Erro: Não é possível registrar um aluguel nulo.");
+        }
+    }
+
+    public List<Aluguel> gerarRelatorioTodosAlugados() {
+        return new ArrayList<>(alugueis);
+    }
+
+    public List<ALuguel> gerarRelatorioAlugadosPorCliente(Cliente c) {
+        List<Aluguel> resultados = new ArrayList<>();
+        for (Aluguel a : alugueis) {
+            if (a.getCliente().equals(c)) {
+                resultados.add(a);
+            }
+        }
+        return resultados;
+    }
+
+    public float calcularFaturamentoMes(int mes, int ano) {
+    float faturamento = 0;
+    for (Aluguel a : alugueis) {
+        LocalDate data = a.getDataAluguel(); 
+        
+        if (data.getMonthValue() == mes && data.getYear() == ano) {
+            faturamento += a.getValorTotal(); 
+        }
+        }
+        return faturamento;
+    }
+   
 
 }
