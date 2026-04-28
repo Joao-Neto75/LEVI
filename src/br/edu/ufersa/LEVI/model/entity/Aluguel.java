@@ -84,3 +84,4 @@ public class Aluguel {
     public LocalDate getDataAluguel() {
     return LocalDate.parse(this.dataEmprestimo);
 }
+}
