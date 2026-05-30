@@ -29,7 +29,7 @@ public class ConnectionFactory {
         }
         return con;
     }
-}
+
 
 public static void closeConnection() {
         if (con != null) {
@@ -41,3 +41,5 @@ public static void closeConnection() {
             }
         }
     }
+
+}
