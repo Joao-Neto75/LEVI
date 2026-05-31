@@ -1,6 +1,6 @@
 package br.edu.ufersa.LEVI.model.entity;
 
-public class Cliente {
+public class Cliente implements Pesquisavel{
 
     private String cpf;
     private int id;
@@ -26,6 +26,13 @@ public class Cliente {
     public void atualizarNome(String novoNome) {
         setNome(novoNome);
     }
+
+    @Override
+    public boolean contemTermo(String termo) {
+        return nome.toLowerCase().contains(termo.toLowerCase())
+                || cpf.contains(termo);
+    }
+
 
     // Getters
     public String getNome() { return nome; }

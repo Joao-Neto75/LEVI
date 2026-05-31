@@ -2,7 +2,7 @@ package br.edu.ufersa.LEVI.model.entity;
 
 import java.time.LocalDate;
 
-public abstract class Produto {
+public abstract class Produto implements Pesquisavel{
     private int id;
     private String titulo;
     private int exemplares;
