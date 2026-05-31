@@ -1,87 +1,102 @@
 package br.edu.ufersa.LEVI.model.entity;
 
-import java.util.ArrayList; // Faltava esse import
-import java.util.List;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Aluguel {
+    private int id;
     private Cliente cliente;
-    private List<Livro> livrosAlugados = new ArrayList<>();
-    private List<Disco> discosAlugados = new ArrayList<>();
-    private String dataEmprestimo;
-    private String dataDevolucao;
+    private List<Produto> produtos = new ArrayList<>();
+    private LocalDate dataEmprestimo;
+    private LocalDate dataDevolucao;
     private float valorTotal;
 
-    public Aluguel(Cliente cliente, Livro livro, String dataEmprestimo) {
-        this.cliente = cliente;
-        this.livrosAlugados.add(livro);
-        this.dataEmprestimo = dataEmprestimo;
-        this.calcularValorTotal();
+    // Construtor vazio
+    public Aluguel() {
+        this.dataEmprestimo = LocalDate.now();
+        this.valorTotal = 0;
     }
-    public Aluguel(Cliente cliente, Disco disco, String dataEmprestimo) {
-        this.cliente = cliente;
-        this.discosAlugados.add(disco);
-        this.dataEmprestimo = dataEmprestimo;
-        this.calcularValorTotal();
+
+    // Construtor com cliente e data
+    public Aluguel(Cliente cliente, LocalDate dataEmprestimo) {
+        setCliente(cliente);
+        setDataEmprestimo(dataEmprestimo);
+    }
+
+    // Construtor com produto já incluso
+    public Aluguel(Cliente cliente, Produto produto, LocalDate dataEmprestimo) {
+        setCliente(cliente);
+        setDataEmprestimo(dataEmprestimo);
+        adicionarProduto(produto);
+    }
+
+    // Métodos
+    public void adicionarProduto(Produto p) {
+        if (p != null && p.verificarDisponibilidade()) {
+            produtos.add(p);
+            p.removerExemplar(1);
+            calcularValorTotal();
+        } else {
+            throw new RuntimeException("Produto indisponível ou inválido!");
+        }
     }
 
     public float calcularValorTotal() {
         float soma = 0;
-        for (Livro l : livrosAlugados) {
-            soma += l.getValorAluguel();
-        }
-        for (Disco d : discosAlugados) {
-            soma += d.getValorAluguel();
+        for (Produto p : produtos) {
+            soma += p.getValorAluguel();
         }
         this.valorTotal = soma;
         return this.valorTotal;
     }
 
-    public void finalizarAluguel(String data) {
-        this.dataDevolucao = data;
-        this.calcularValorTotal();
-    }
-
-    public Cliente getCliente(){
-        return this.cliente;
-    }
-
-    public List<Livro> getLivrosAlugados(){
-        return this.livrosAlugados;
-    }
-
-    public List<Disco> getDiscosAlugados(){
-        return this.discosAlugados;
-    }
-
-    public String getDataEmprestimo(){
-        return this.dataEmprestimo;
-    }
-
-    public String getDataDevolucao(){
-        return this.dataDevolucao;
-    }
-
-    public void setDataDevolucao(String dataDevolucao){
-        this.dataDevolucao = dataDevolucao;
-    }
-
-    public float getValorTotal() {
-        return this.valorTotal;
-    }
-
-    public void addLivro(Livro livro) {
-        this.livrosAlugados.add(livro);
-        this.calcularValorTotal();
-    }
-
-    public void addDisco(Disco disco) {
-        this.discosAlugados.add(disco);
-        this.calcularValorTotal();
+    public void finalizarAluguel(LocalDate dataDevolucao) {
+        setDataDevolucao(dataDevolucao);
+        // devolve os exemplares
+        for (Produto p : produtos) {
+            p.adicionarExemplar(1);
+        }
+        calcularValorTotal();
     }
 
     public LocalDate getDataAluguel() {
-    return LocalDate.parse(this.dataEmprestimo);
-}
+        return this.dataEmprestimo;
+    }
+
+    // Getters
+    public int getId() { return id; }
+    public Cliente getCliente() { return cliente; }
+    public List<Produto> getProdutos() { return produtos; }
+    public LocalDate getDataEmprestimo() { return dataEmprestimo; }
+    public LocalDate getDataDevolucao() { return dataDevolucao; }
+    public float getValorTotal() { return valorTotal; }
+
+    // Setters com validação
+    public void setId(int id) { this.id = id; }
+
+    public void setCliente(Cliente cliente) {
+        if (cliente != null)
+            this.cliente = cliente;
+        else
+            throw new IllegalArgumentException("Cliente não pode ser nulo!");
+    }
+
+    public void setDataEmprestimo(LocalDate dataEmprestimo) {
+        if (dataEmprestimo != null)
+            this.dataEmprestimo = dataEmprestimo;
+        else
+            this.dataEmprestimo = LocalDate.now();
+    }
+
+    public void setDataDevolucao(LocalDate dataDevolucao) {
+        if (dataDevolucao != null && !dataDevolucao.isBefore(dataEmprestimo))
+            this.dataDevolucao = dataDevolucao;
+        else
+            throw new IllegalArgumentException("Data de devolução inválida!");
+    }
+
+    public void setValorTotal(float valorTotal) {
+        this.valorTotal = valorTotal;
+    }
 }
