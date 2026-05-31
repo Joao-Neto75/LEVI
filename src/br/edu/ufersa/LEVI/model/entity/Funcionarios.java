@@ -2,10 +2,19 @@ package br.edu.ufersa.LEVI.model.entity;
 import java.util.Date;
 
 public class Funcionarios {
+    private int id;
     private String nome;
     private String cargo;
     private double salario;
     private Date contratacao;
+
+    // adicionar construtor vazio
+    public Funcionarios() {
+        this.nome = "Sem nome";
+        this.cargo = "Sem cargo";
+        this.salario = 0;
+        this.contratacao = new Date();
+    }
 
     // Construtor
     public Funcionarios(String nome, String cargo, double salario, Date contratacao) {
@@ -33,12 +42,16 @@ public class Funcionarios {
         return contratacao;
     }
 
+    public int getId() { return id; }
+
     // Setters
     public void setNome(String nome) {
         if (!nome.isEmpty()){
         this.nome = nome;}
         else {this.nome = "Sem nome";}
     }
+
+    public void setId(int id) { this.id = id; }
 
     public void setCargo(String cargo) {
         if (!cargo.isEmpty()){
