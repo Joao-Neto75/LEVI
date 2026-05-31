@@ -3,6 +3,7 @@ package br.edu.ufersa.LEVI.model.entity;
 public class Cliente {
 
     private String cpf;
+    private int id;
     private String nome;
     private String endereco;
 
@@ -28,6 +29,7 @@ public class Cliente {
 
     // Getters
     public String getNome() { return nome; }
+    public int getId() { return id; }
     public String getEndereco() { return endereco; }
     public String getCpf() { return cpf; }
 
@@ -37,6 +39,8 @@ public class Cliente {
         this.nome = nome;}
         else {this.nome = "Fantasma";}
     }
+
+    public void setId(int id) { this.id = id; }
 
     public void setEndereco(String endereco) {
         if (!endereco.isEmpty()){
