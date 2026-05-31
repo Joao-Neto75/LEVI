@@ -1,98 +1,46 @@
 package br.edu.ufersa.LEVI.model.entity;
+import java.time.LocalDate;
 
-public class Disco {
-    private String titulo;
+public class Disco extends Produto {
     private String banda;
     private String estilo;
-    private int exemplares;
-    private float valorAluguel;
 
-    // Construtor vazio
     public Disco() {
-        this.titulo = "Sem título";
+        super();
         this.banda = "Sem banda";
         this.estilo = "Sem estilo";
-        this.exemplares = 0;
-        this.valorAluguel = 0;
     }
 
-    // Construtor completo
-    public Disco(String titulo, String banda, String estilo, int exemplares, float valorAluguel) {
-        setTitulo(titulo);
+    public Disco(String titulo, String banda, String estilo,
+                 int exemplares, float valorAluguel, LocalDate ano) {
+        super(titulo, exemplares, valorAluguel, ano);
         setBanda(banda);
         setEstilo(estilo);
-        setExemplares(exemplares);
-        setValorAluguel(valorAluguel);
     }
 
-    // Métodos
-    public void atualizarValorAluguel(float novoValor) {
-        setValorAluguel(novoValor);
+    @Override
+    public String getDescricao() {
+        return "Disco: " + getTitulo() + " | Banda: " + banda + " | Estilo: " + estilo;
     }
 
-    public void adicionarExemplar(int quantidade) {
-        if (quantidade <= 0)
-            throw new IllegalArgumentException("Quantidade deve ser maior que zero!");
-        this.exemplares += quantidade;
+    @Override
+    public boolean contemTermo(String termo) {
+        return getTitulo().toLowerCase().contains(termo.toLowerCase())
+                || banda.toLowerCase().contains(termo.toLowerCase())
+                || estilo.toLowerCase().contains(termo.toLowerCase());
     }
 
-    public void removerExemplar(int quantidade) {
-        if (quantidade <= 0)
-            throw new IllegalArgumentException("Quantidade deve ser maior que zero!");
-        if (quantidade > this.exemplares)
-            throw new IllegalArgumentException("Quantidade maior que o estoque disponível!");
-        this.exemplares -= quantidade;
-    }
-
-    public boolean verificarDisponibilidade() {
-        return this.exemplares > 0;
-    }
-
-    // Getters
-    public String getTitulo() { return titulo; }
+    // Getters e Setters específicos de Disco
     public String getBanda() { return banda; }
     public String getEstilo() { return estilo; }
-    public int getExemplares() { return exemplares; }
-    public float getValorAluguel() { return valorAluguel; }
-
-    // Setters com validação
-    public void setTitulo(String titulo) {
-        if (titulo != null && !titulo.isEmpty()) {
-            this.titulo = titulo;
-        } else {
-            this.titulo = "Sem título";
-        }
-    }
 
     public void setBanda(String banda) {
-        if (banda != null && !banda.isEmpty()) {
-            this.banda = banda;
-        } else {
-            this.banda = "Sem banda";
-        }
+        if (banda != null && !banda.isEmpty()) this.banda = banda;
+        else this.banda = "Sem banda";
     }
 
     public void setEstilo(String estilo) {
-        if (estilo != null && !estilo.isEmpty()) {
-            this.estilo = estilo;
-        } else {
-            this.estilo = "Sem estilo";
-        }
-    }
-
-    public void setExemplares(int exemplares) {
-        if (exemplares >= 0) {
-            this.exemplares = exemplares;
-        } else {
-            this.exemplares = 0;
-        }
-    }
-
-    public void setValorAluguel(float valorAluguel) {
-        if (valorAluguel >= 0) {
-            this.valorAluguel = valorAluguel;
-        } else {
-            this.valorAluguel = 0;
-        }
+        if (estilo != null && !estilo.isEmpty()) this.estilo = estilo;
+        else this.estilo = "Sem estilo";
     }
 }
