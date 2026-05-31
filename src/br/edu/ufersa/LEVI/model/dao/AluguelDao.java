@@ -4,11 +4,10 @@ import br.edu.ufersa.LEVI.model.entity.Aluguel;
 import br.edu.ufersa.LEVI.model.entity.Cliente;
 import br.edu.ufersa.LEVI.model.entity.Produto;
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AluguelDAO implements BaseDao<Aluguel> {
+public class AluguelDao implements BaseDao<Aluguel> {
 
     public Aluguel inserir(Aluguel entity) {
         Connection con = BaseDao.getConnection();
