@@ -2,6 +2,7 @@ package br.edu.ufersa.LEVI.model.dao;
 import java.sql.Connection;
 import br.edu.ufersa.LEVI.connection.ConnectionFactory;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.ResultSet;
 import java.util.List;

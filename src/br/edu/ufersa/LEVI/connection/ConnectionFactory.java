@@ -32,9 +32,9 @@ public class ConnectionFactory {
 
 
 public static void closeConnection() {
-        if (con != null) {
+        if (ConnectionFactory.con != null) {
             try {
-                con.close();
+                ConnectionFactory.con.close();
             } catch (SQLException e) {
                 // retorna erro em caso de falha ao fechar uma comunicação
                 throw new RuntimeException("Erro ao fechar a conexão com o banco de dados!");
