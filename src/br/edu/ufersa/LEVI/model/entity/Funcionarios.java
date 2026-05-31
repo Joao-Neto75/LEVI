@@ -25,6 +25,7 @@ public class Funcionarios {
         
     }
 
+
     // Getters
     public String getNome() {
         return nome;
