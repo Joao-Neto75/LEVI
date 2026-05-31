@@ -57,21 +57,5 @@ public class Funcionarios {
         this.contratacao = contratacao;}
         else {this.contratacao = new Date();}
     }
-
-    // Métodos de atualização
-    public void atualizarCargo(String novoCargo) {
-        setCargo(novoCargo);
-    } 
-
-    public void atualizarSalario(double novoSalario) {
-        setSalario(novoSalario);
-    }
-
-    public void exibirInformacoes() {
-        System.out.println("Nome: " + getNome());
-        System.out.println("Cargo: " + getCargo());
-        System.out.printf("Salário: R$ %.2f\n" + getSalario());
-        System.out.println("Data de Contratação: " + getContratacao());
-    }
     
 }

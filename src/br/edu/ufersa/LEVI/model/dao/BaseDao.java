@@ -2,11 +2,11 @@ package br.edu.ufersa.LEVI.model.dao;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.ResultSet;
+import java.util.List;
+
 
 public interface BaseDao <E> {
-    String URL = "jdbc:mysql:";
-    String USER = "";   
-    String PASSWORD = "";
     // colocar o nome do banco de dados no final da url
     final static String URL = "jdbc:mysql://localhost:3306/";
 
@@ -26,7 +26,6 @@ public interface BaseDao <E> {
             // retorna o erro se o banco estiver desligado ou a senha de acesso esteja errada
             throw new RuntimeException("Erro ao conectar ao banco de dados: " + e.getMessage());
         }
-        return null;
     }
 
 
@@ -45,15 +44,8 @@ public interface BaseDao <E> {
     public E inserir(E entity);
     public E deletar(E entity);
     public E alterar(E entity);
-    public ResultSet buscar(String parametro);
-    public ResultSet listar();
-
-
-
-
-
-
-
+    public List<E> buscar(String parametro);
+    public List<E> listar();
 
 
 }

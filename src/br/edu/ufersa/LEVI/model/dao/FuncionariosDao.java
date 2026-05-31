@@ -4,12 +4,14 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FuncionariosDao implements BaseDao<Funcionarios> {
     private static Connection con;
     
 
-    public FuncionariosDao inserir (Funcionarios entity){
+    public Funcionarios inserir (Funcionarios entity){
         con = BaseDao.getConnection();
         String sql = "INSERT INTO funcionarios (nome, cargo, salario, contratacao)" + "VALUES (?, ?, ?, ?)";
         try {
@@ -33,7 +35,7 @@ public class FuncionariosDao implements BaseDao<Funcionarios> {
         
     }
 
-    public FuncionaiosDao deletar (Funcionarios entity){
+    public Funcionarios deletar (Funcionarios entity){
         con = BaseDao.getConnection();
         String sql = "DELETE FROM funcionarios WHERE id=?";
         try {
@@ -47,7 +49,7 @@ public class FuncionariosDao implements BaseDao<Funcionarios> {
         return entity;
     }
 
-    public FuncionariosDao alterar (Funcionarios entity){
+    public Funcionarios alterar (Funcionarios entity){
         con = BaseDao.getConnection();
         String sql = "UPDATE funcionarios SET nome=?, cargo=?, salario=?, contratacao=? WHERE id=?";
         try {
@@ -65,30 +67,59 @@ public class FuncionariosDao implements BaseDao<Funcionarios> {
         return entity;
     }
 
-    public ResultSet buscar(String parametro) {
-        con = BaseDao.getConnection();
-        String sql = "SELECT * FROM funcionarios AS f WHERE  f.Nome=?";
-        ResultSet resul = null;
-        try {
-            PreparedStatement stmt = con.prepareStatement(sql);
-            stmt.setString(1, parametro);
-            resul = stmt.executeQuery();
+    
+    public List<Funcionarios> buscar(String parametro) {
+        String sql = "SELECT * FROM funcionarios WHERE nome LIKE ?";
+        List<Funcionarios> lista = new ArrayList<>();
+
+        
+        try (Connection con = BaseDao.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            
+            
+            stmt.setString(1, "%" + parametro + "%"); 
+            
+            try (ResultSet resul = stmt.executeQuery()) {
+                while (resul.next()) {
+                    Funcionarios f = new Funcionarios();
+                    f.setId(resul.getInt("id"));
+                    f.setNome(resul.getString("nome"));
+                    f.setCargo(resul.getString("cargo"));
+                    f.setSalario(resul.getDouble("salario"));
+                    f.setContratacao(resul.getDate("contratacao"));
+                    
+                    lista.add(f);
+                }
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Erro na busca: " + e.getMessage());
         }
-        return resul;
+        return lista; 
     }
 
-    public ResultSet listar() {
-        con = BaseDao.getConnection();
+    
+    public List<Funcionarios> listar() {
         String sql = "SELECT * FROM funcionarios";
-        ResultSet resul = null;
-        try {
-            PreparedStatement stmt = con.prepareStatement(sql);
-            resul = stmt.executeQuery();
+        List<Funcionarios> lista = new ArrayList<>();
+
+        try (Connection con = BaseDao.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql);
+             ResultSet resul = stmt.executeQuery()) {
+            
+            while (resul.next()) {
+                Funcionarios f = new Funcionarios();
+                f.setId(resul.getInt("id"));
+                f.setNome(resul.getString("nome"));
+                f.setCargo(resul.getString("cargo"));
+                f.setSalario(resul.getDouble("salario"));
+                f.setContratacao(resul.getDate("contratacao"));
+                
+                lista.add(f);
+            }
         } catch (SQLException e) {
             throw new RuntimeException("Erro na listagem: " + e.getMessage());
         }
+        return lista;
     }
 
 }
