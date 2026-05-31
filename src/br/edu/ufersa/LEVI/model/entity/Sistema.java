@@ -149,7 +149,7 @@ public class Sistema {
     public List<Livro> pesquisarLivroPorAno(int ano) {
         List<Livro> resultados = new ArrayList<>();
         for (Livro l : livros) {
-            if (l.getAno() == ano) {
+            if (l.getAno().getYear() == ano) {
                 resultados.add(l);
             }
         }
@@ -197,13 +197,9 @@ public class Sistema {
     }
 
     public Cliente pesquisarClientePorCpf(String cpf) {
-        List<Cliente> resultados = new ArrayList<>();
-        for (Cliente c : clientes) {
-            if (c.getCpf().equals(cpf)) {
-                resultados.add(c);
-            }
-        }
-        return resultados;
+        for (Cliente c : clientes)
+            if (c.getCpf().equals(cpf)) return c;
+        return null;
     }
 
     public void registrarAluguel(Aluguel a) {
@@ -219,7 +215,7 @@ public class Sistema {
         return new ArrayList<>(alugueis);
     }
 
-    public List<ALuguel> gerarRelatorioAlugadosPorCliente(Cliente c) {
+    public List<Aluguel> gerarRelatorioAlugadosPorCliente(Cliente c) {
         List<Aluguel> resultados = new ArrayList<>();
         for (Aluguel a : alugueis) {
             if (a.getCliente().equals(c)) {
