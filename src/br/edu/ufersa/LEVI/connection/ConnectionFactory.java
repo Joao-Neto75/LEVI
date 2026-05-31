@@ -6,7 +6,7 @@ import java.sql.SQLException;
 
 public class ConnectionFactory {
     // colocar o nome do banco de dados no final da url
-    private static final String URL = "jdbc:mysql://localhost:3306/";
+    private static final String URL = "jdbc:mysql://localhost:3306/levi";
 
     // colocar o user local do banco de dados
     private static final String USER = "";
