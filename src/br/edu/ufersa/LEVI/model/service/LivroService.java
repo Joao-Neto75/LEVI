@@ -1,4 +1,4 @@
-package br.edu.ufersa.LEVI.service;
+package br.edu.ufersa.LEVI.model.service;
 
 import br.edu.ufersa.LEVI.model.dao.LivroDao;
 import br.edu.ufersa.LEVI.model.entity.Livro;

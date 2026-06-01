@@ -1,7 +1,6 @@
 package br.edu.ufersa.LEVI.model.service;
 
-import br.edu.ufersa.LEVI.model.dao.AluguelDAO;
-import br.edu.ufersa.LEVI.model.dao.BaseDao;
+import br.edu.ufersa.LEVI.model.dao.AluguelDao;
 import br.edu.ufersa.LEVI.model.entity.Aluguel;
 import br.edu.ufersa.LEVI.model.entity.Cliente;
 import br.edu.ufersa.LEVI.model.entity.Produto;
@@ -9,7 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public class AluguelService {
-    private AluguelDAO dao = new AluguelDAO();
+    private AluguelDao dao = new AluguelDao();
 
     public Aluguel registrar(Aluguel entity) {
         // Regra: cliente não pode ser nulo
