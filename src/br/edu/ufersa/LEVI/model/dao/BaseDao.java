@@ -11,11 +11,11 @@ import java.util.List;
 public interface BaseDao <E> {
 
     public static Connection getConnection() {
-        return ConnectionFactory.getConnection();
+        return ConnectionFactory.getInstance().getConnection();
     }
 
     public static void closeConnection() {
-        ConnectionFactory.closeConnection();
+        ConnectionFactory.getInstance().closeConnection();
     }
 
 
