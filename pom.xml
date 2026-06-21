@@ -14,7 +14,7 @@
     <properties>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <project.build.sourceEnconding>UTF-8</project.build.sourceEnconding>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
     <dependencies>
@@ -24,19 +24,29 @@
             <version>8.0.33</version>
         </dependency>
 
-
         <dependency>
-            <groupId> org.openjfx </groupId>
-            <artifactId> javafx-controls </artifactId>
-            <version> 22 </version>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>22</version>
         </dependency>
         <dependency>
-            <groupId> org.openjfx </groupId>
-            <artifactId> javafx-fxml </artifactId>
-            <version> 22 </version>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-fxml</artifactId>
+            <version>22</version>
         </dependency>
-
-
     </dependencies>
+
+    <build>
+        <!-- Garante que .fxml e .png dentro de src também sejam copiados para o
+             classpath final, já que o projeto não usa a pasta padrão src/main/resources -->
+        <resources>
+            <resource>
+                <directory>src</directory>
+                <excludes>
+                    <exclude>**/*.java</exclude>
+                </excludes>
+            </resource>
+        </resources>
+    </build>
 
 </project>
