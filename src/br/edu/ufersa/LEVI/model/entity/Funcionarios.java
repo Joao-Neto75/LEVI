@@ -7,6 +7,8 @@ public class Funcionarios {
     private String cargo;
     private double salario;
     private Date contratacao;
+    private String email;
+    private String senha;
 
     // adicionar construtor vazio
     public Funcionarios() {
@@ -14,15 +16,25 @@ public class Funcionarios {
         this.cargo = "Sem cargo";
         this.salario = 0;
         this.contratacao = new Date();
+        this.email = "sem_email@LEVI.com";
+        this.senha = "0000";
+
     }
 
     // Construtor
-    public Funcionarios(String nome, String cargo, double salario, Date contratacao) {
+    public Funcionarios(String nome, String cargo, double salario, Date contratacao, String email, String senha) {
         setNome(nome);
         setCargo(cargo);
         setSalario(salario);
         setContratacao(contratacao);
+        setEmail(email);
+        setSenha(senha);
         
+    }
+
+    // Verifica se o e-mail e a senha informados batem com os deste funcionário
+    public boolean autenticar(String email, String senha) {
+        return this.email.equalsIgnoreCase(email) && this.senha.equals(senha);
     }
 
 
@@ -44,6 +56,10 @@ public class Funcionarios {
     }
 
     public int getId() { return id; }
+
+    public String getEmail(){return email;}
+
+    public String getSenha(){return senha;}
 
     // Setters
     public void setNome(String nome) {
@@ -71,5 +87,22 @@ public class Funcionarios {
         this.contratacao = contratacao;}
         else {this.contratacao = new Date();}
     }
+
+    public void setEmail(String email) {
+        if (email != null && !email.trim().isEmpty()) {
+            this.email = email;
+        } else {
+            this.email = "sem_email@levi.com";
+        }
+    }
+
+    public void setSenha(String senha) {
+        if (senha != null && !senha.trim().isEmpty()) {
+            this.senha = senha;
+        } else {
+            this.senha = "0000";
+        }
+    }
+
     
 }
