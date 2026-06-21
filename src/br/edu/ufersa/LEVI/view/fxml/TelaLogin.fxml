@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<StackPane prefHeight="650.0" prefWidth="900.0" style="-fx-background-color: #1E1E1E;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.edu.ufersa.LEVI.view.Controller.LoginController">
+   <children>
+   
+       <VBox alignment="CENTER" maxHeight="500.0" maxWidth="450.0" spacing="14.0" style="-fx-background-color: #F4E9DD; -fx-border-color: #D4A537; -fx-border-width: 3;">
+   
+           <padding>
+               <Insets bottom="40" left="50" right="50" top="40" />
+           </padding>
+      <children>
+      
+              <Label style="-fx-font-size: 26px; -fx-font-weight: bold;" text="DUDUTECA" />
+      
+              <Label style="-fx-font-size: 20px;" text="Acesse sua conta">
+                  <VBox.margin>
+                      <Insets bottom="10" top="20" />
+                  </VBox.margin>
+              </Label>
+      
+              <Label style="-fx-font-weight: bold;" text="E-mail" />
+              <TextField fx:id="campoEmail" promptText="dudu.POO@ufersa.edu.br" />
+      
+              <Label style="-fx-font-weight: bold;" text="Senha">
+                  <VBox.margin>
+                      <Insets top="10" />
+                  </VBox.margin>
+              </Label>
+              <PasswordField fx:id="campoSenha" />
+      
+              <Button fx:id="botaoEntrar" onAction="#handleLogin" prefHeight="45.0" prefWidth="350.0" style="-fx-background-color: #D4A537; -fx-font-size: 18px; -fx-font-weight: bold;" text="Entra">
+                  <VBox.margin>
+                      <Insets top="20" />
+                  </VBox.margin>
+              </Button>
+      
+              <Label fx:id="labelErro" style="-fx-font-size: 12px;" textFill="RED" wrapText="true" />
+      
+              <Label style="-fx-text-fill: #555;" text="Esqueceu sua senha?">
+                  <VBox.margin>
+                      <Insets top="5" />
+                  </VBox.margin>
+              </Label>
+      </children>
+   
+       </VBox>
+   </children>
+
+</StackPane>
