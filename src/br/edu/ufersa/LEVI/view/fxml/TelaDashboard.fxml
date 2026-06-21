@@ -39,7 +39,7 @@
                    <graphic>
                        <ImageView fitHeight="26.0" fitWidth="26.0" preserveRatio="true">
                            <image>
-                               <Image url="@../../../../../../../../../Users/João%20Neto/icons/livro.png" />
+                               <Image url="@../icons/livro.png" />
                            </image>
                        </ImageView>
                    </graphic>
@@ -49,7 +49,7 @@
                    <graphic>
                        <ImageView fitHeight="26.0" fitWidth="26.0" preserveRatio="true">
                            <image>
-                               <Image url="@../../../../../../../../../Users/João%20Neto/icons/disco.png" />
+                               <Image url="@../icons/disco.png" />
                            </image>
                        </ImageView>
                    </graphic>
@@ -59,7 +59,7 @@
                    <graphic>
                        <ImageView fitHeight="26.0" fitWidth="26.0" preserveRatio="true">
                            <image>
-                               <Image url="@../../../../../../../../../Users/João%20Neto/icons/cliente.png" />
+                               <Image url="@../icons/cliente.png" />
                            </image>
                        </ImageView>
                    </graphic>
@@ -69,7 +69,7 @@
                    <graphic>
                        <ImageView fitHeight="26.0" fitWidth="26.0" preserveRatio="true">
                            <image>
-                               <Image url="@../../../../../../../../../Users/João%20Neto/icons/aluguel.png" />
+                               <Image url="@../icons/aluguel.png" />
                            </image>
                        </ImageView>
                    </graphic>
@@ -101,7 +101,7 @@
                    <graphic>
                        <ImageView fitHeight="22.0" fitWidth="22.0" preserveRatio="true">
                            <image>
-                               <Image url="@../../../../../../../../../Users/João%20Neto/icons/relatorio.png" />
+                               <Image url="@../icons/relatorio.png" />
                            </image>
                        </ImageView>
                    </graphic>
