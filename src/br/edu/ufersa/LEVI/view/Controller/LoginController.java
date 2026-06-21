@@ -33,7 +33,7 @@ public class LoginController {
             // guarda o funcionário logado para uso nas próximas telas
             SessaoUsuario.setFuncionarioLogado(logado);
 
-            App.trocarTela("/br/edu/ufersa/LEVI/view/fxml/dashboard.fxml", "Duduteca - Dashboard");
+            App.trocarTela("/br/edu/ufersa/LEVI/view/fxml/TelaDashboard.fxml", "Duduteca - Dashboard");
 
         } catch (RuntimeException e) {
             // mensagens como "E-mail ou senha inválidos!" vindas do FuncionariosService

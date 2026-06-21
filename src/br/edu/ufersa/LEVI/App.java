@@ -15,7 +15,7 @@ public class App extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         stagePrincipal = stage;
-        trocarTela("/br/edu/ufersa/LEVI/view/fxml/login.fxml", "Duduteca - Login");
+        trocarTela("/br/edu/ufersa/LEVI/view/fxml/TelaLogin.fxml", "Duduteca - Login");
     }
 
     // Carrega um novo FXML e troca a Scene da Stage principal.
