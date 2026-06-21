@@ -38,8 +38,10 @@ public class LoginController {
         } catch (RuntimeException e) {
             // mensagens como "E-mail ou senha inválidos!" vindas do FuncionariosService
             labelErro.setText(e.getMessage());
+            e.printStackTrace();
         } catch (IOException e) {
             labelErro.setText("Erro ao carregar a próxima tela. Avise o grupo!");
+            e.printStackTrace();
         }
     }
 }
