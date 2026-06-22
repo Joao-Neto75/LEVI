@@ -2,7 +2,7 @@ package br.edu.ufersa.LEVI.view.Controller;
 
 import br.edu.ufersa.LEVI.App;
 import br.edu.ufersa.LEVI.model.entity.Funcionarios;
-import br.edu.ufersa.LEVI.model.service.FuncionariosService;
+import br.edu.ufersa.LEVI.model.service.LocadoraFacade;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -18,7 +18,9 @@ public class LoginController {
     @FXML private Button botaoEntrar;
     @FXML private Label labelErro;
 
-    private final FuncionariosService funcionariosService = new FuncionariosService();
+    // Antes: "private final FuncionariosService funcionariosService = new FuncionariosService();"
+    // Agora: usa a Facade, que por trás delega para o FuncionariosService.
+    private final LocadoraFacade facade = new LocadoraFacade();
 
     @FXML
     public void handleLogin() {
@@ -28,7 +30,7 @@ public class LoginController {
         String senha = campoSenha.getText();
 
         try {
-            Funcionarios logado = funcionariosService.autenticar(email, senha);
+            Funcionarios logado = facade.autenticar(email, senha);
 
             // guarda o funcionário logado para uso nas próximas telas
             SessaoUsuario.setFuncionarioLogado(logado);
@@ -38,10 +40,8 @@ public class LoginController {
         } catch (RuntimeException e) {
             // mensagens como "E-mail ou senha inválidos!" vindas do FuncionariosService
             labelErro.setText(e.getMessage());
-            e.printStackTrace();
         } catch (IOException e) {
             labelErro.setText("Erro ao carregar a próxima tela. Avise o grupo!");
-            e.printStackTrace();
         }
     }
 }

@@ -1,4 +1,6 @@
 package br.edu.ufersa.LEVI.model.dao;
+
+import br.edu.ufersa.LEVI.connection.ConnectionFactory;
 import br.edu.ufersa.LEVI.model.entity.Funcionarios;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -7,15 +9,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FuncionariosDao implements BaseDao<Funcionarios> {
-    private static Connection con;
+public class FuncionariosDao extends AbstractDao<Funcionarios> {
 
-
-    public Funcionarios inserir (Funcionarios entity){
-        con = BaseDao.getConnection();
+    @Override
+    protected Funcionarios executarInsercao(Connection con, Funcionarios entity) throws SQLException {
         String sql = "INSERT INTO funcionarios (nome, cargo, salario, contratacao, email, senha) VALUES (?, ?, ?, ?, ?, ?)";
-        try {
-            PreparedStatement stmt = con.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+
+        try (PreparedStatement stmt = con.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, entity.getNome());
             stmt.setString(2, entity.getCargo());
             stmt.setDouble(3, entity.getSalario());
@@ -23,39 +23,21 @@ public class FuncionariosDao implements BaseDao<Funcionarios> {
             stmt.setString(5, entity.getEmail());
             stmt.setString(6, entity.getSenha());
             stmt.execute();
-            ResultSet resul = stmt.getGeneratedKeys();
-            if (resul.next()) {
-                int id = resul.getInt(1);
-                entity.setId(id);
+
+            try (ResultSet resul = stmt.getGeneratedKeys()) {
+                if (resul.next()) {
+                    entity.setId(resul.getInt(1));
+                }
             }
-
-            stmt.close();
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro na inserção: " + e.getMessage());
-        }
-        return entity;
-
-    }
-
-    public Funcionarios deletar (Funcionarios entity){
-        con = BaseDao.getConnection();
-        String sql = "DELETE FROM funcionarios WHERE id=?";
-        try {
-            PreparedStatement stmt = con.prepareStatement(sql);
-            stmt.setInt(1, entity.getId());
-            stmt.execute();
-            stmt.close();
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro na exclusão: " + e.getMessage());
         }
         return entity;
     }
 
-    public Funcionarios alterar (Funcionarios entity){
-        con = BaseDao.getConnection();
+    @Override
+    protected Funcionarios executarAlteracao(Connection con, Funcionarios entity) throws SQLException {
         String sql = "UPDATE funcionarios SET nome=?, cargo=?, salario=?, contratacao=?, email=?, senha=? WHERE id=?";
-        try {
-            PreparedStatement stmt = con.prepareStatement(sql);
+
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setString(1, entity.getNome());
             stmt.setString(2, entity.getCargo());
             stmt.setDouble(3, entity.getSalario());
@@ -64,23 +46,27 @@ public class FuncionariosDao implements BaseDao<Funcionarios> {
             stmt.setString(6, entity.getSenha());
             stmt.setInt(7, entity.getId());
             stmt.execute();
-            stmt.close();
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro na atualização: " + e.getMessage());
         }
         return entity;
     }
 
+    @Override
+    protected Funcionarios executarExclusao(Connection con, Funcionarios entity) throws SQLException {
+        String sql = "DELETE FROM funcionarios WHERE id=?";
 
-    public List<Funcionarios> buscar(String parametro) {
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setInt(1, entity.getId());
+            stmt.execute();
+        }
+        return entity;
+    }
+
+    @Override
+    protected List<Funcionarios> executarBusca(Connection con, String parametro) throws SQLException {
         String sql = "SELECT * FROM funcionarios WHERE nome LIKE ?";
         List<Funcionarios> lista = new ArrayList<>();
 
-
-        try (Connection con = BaseDao.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sql)) {
-
-
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setString(1, "%" + parametro + "%");
 
             try (ResultSet resul = stmt.executeQuery()) {
@@ -88,34 +74,31 @@ public class FuncionariosDao implements BaseDao<Funcionarios> {
                     lista.add(mapearFuncionario(resul));
                 }
             }
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro na busca: " + e.getMessage());
         }
         return lista;
     }
 
-
-    public List<Funcionarios> listar() {
+    @Override
+    protected List<Funcionarios> executarListagem(Connection con) throws SQLException {
         String sql = "SELECT * FROM funcionarios";
         List<Funcionarios> lista = new ArrayList<>();
 
-        try (Connection con = BaseDao.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sql);
+        try (PreparedStatement stmt = con.prepareStatement(sql);
              ResultSet resul = stmt.executeQuery()) {
 
             while (resul.next()) {
                 lista.add(mapearFuncionario(resul));
             }
-        } catch (SQLException e) {
-            throw new RuntimeException("Erro na listagem: " + e.getMessage());
         }
         return lista;
     }
 
-    // Busca um único funcionário pelo e-mail, usado no momento do login
+    // Método específico de FuncionariosDao, usado só no login. Não faz parte
+    // do contrato BaseDao, então não segue o "molde" do Template Method — abre
+    // e fecha a conexão manualmente, como fazia antes.
     public Funcionarios buscarPorEmail(String email) {
         String sql = "SELECT * FROM funcionarios WHERE email = ?";
-        try (Connection con = BaseDao.getConnection();
+        try (Connection con = ConnectionFactory.getInstance().getConnection();
              PreparedStatement stmt = con.prepareStatement(sql)) {
 
             stmt.setString(1, email);
@@ -127,11 +110,12 @@ public class FuncionariosDao implements BaseDao<Funcionarios> {
             }
         } catch (SQLException e) {
             throw new RuntimeException("Erro na busca por e-mail: " + e.getMessage());
+        } finally {
+            ConnectionFactory.getInstance().closeConnection();
         }
         return null;
     }
 
-    // monta o objeto Funcionarios a partir de uma linha do ResultSet
     private Funcionarios mapearFuncionario(ResultSet resul) throws SQLException {
         Funcionarios f = new Funcionarios();
         f.setId(resul.getInt("id"));
@@ -143,5 +127,4 @@ public class FuncionariosDao implements BaseDao<Funcionarios> {
         f.setSenha(resul.getString("senha"));
         return f;
     }
-
 }

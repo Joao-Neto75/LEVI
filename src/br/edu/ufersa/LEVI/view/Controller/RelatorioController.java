@@ -4,8 +4,7 @@ import br.edu.ufersa.LEVI.App;
 import br.edu.ufersa.LEVI.model.entity.Aluguel;
 import br.edu.ufersa.LEVI.model.entity.Cliente;
 import br.edu.ufersa.LEVI.model.entity.Produto;
-import br.edu.ufersa.LEVI.model.service.AluguelService;
-import br.edu.ufersa.LEVI.model.service.ClienteService;
+import br.edu.ufersa.LEVI.model.service.LocadoraFacade;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -55,8 +54,7 @@ public class RelatorioController {
 
     private static final String FILTRO_TODO = "Todo";
 
-    private final AluguelService aluguelService = new AluguelService();
-    private final ClienteService clienteService = new ClienteService();
+    private final LocadoraFacade facade = new LocadoraFacade();
 
     private int mesSelecionado;
     private int anoSelecionado;
@@ -143,7 +141,7 @@ public class RelatorioController {
         boxCabecalhoCliente.setManaged(false);
         colunaCliente.setVisible(true);
 
-        List<Aluguel> alugueis = aluguelService.buscarPorMes(mesSelecionado, anoSelecionado);
+        List<Aluguel> alugueis = facade.buscarAlugueisPorMes(mesSelecionado, anoSelecionado);
         montarTabela(alugueis);
     }
 
@@ -156,7 +154,7 @@ public class RelatorioController {
             return;
         }
 
-        List<Cliente> encontrados = clienteService.pesquisarClientes(termo);
+        List<Cliente> encontrados = facade.pesquisarClientes(termo);
 
         if (encontrados.isEmpty()) {
             labelErro.setText("Nenhum cliente encontrado com esse nome ou CPF.");
@@ -175,7 +173,7 @@ public class RelatorioController {
         exibirCabecalhoCliente(cliente);
 
         colunaCliente.setVisible(false);
-        List<Aluguel> alugueis = aluguelService.buscarPorCliente(cliente);
+        List<Aluguel> alugueis = facade.buscarAlugueisPorCliente(cliente);
         montarTabela(alugueis);
     }
 
@@ -208,10 +206,10 @@ public class RelatorioController {
     }
 
     private void carregarFaturamentoDoMes() {
-        float faturamento = aluguelService.calcularFaturamentoMes(mesSelecionado, anoSelecionado);
+        float faturamento = facade.calcularFaturamentoMes(mesSelecionado, anoSelecionado);
         labelFaturamento.setText(String.format("R$ %.2f", faturamento));
 
-        List<Aluguel> alugueis = aluguelService.buscarPorMes(mesSelecionado, anoSelecionado);
+        List<Aluguel> alugueis = facade.buscarAlugueisPorMes(mesSelecionado, anoSelecionado);
         int totalLivros = 0;
         int totalDiscos = 0;
 

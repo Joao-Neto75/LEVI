@@ -9,15 +9,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DiscoDao implements BaseDao<Disco> {
+public class DiscoDao extends AbstractDao<Disco> {
 
     @Override
-    public Disco inserir(Disco disco) {
+    protected Disco executarInsercao(Connection con, Disco disco) throws SQLException {
         String sql = "INSERT INTO disco (titulo, banda, estilo, ano, exemplares, valor_aluguel) VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (Connection conn = BaseDao.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
-
+        try (PreparedStatement stmt = con.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stmt.setString(1, disco.getTitulo());
             stmt.setString(2, disco.getBanda());
             stmt.setString(3, disco.getEstilo());
@@ -32,22 +30,15 @@ public class DiscoDao implements BaseDao<Disco> {
                     disco.setId(generatedKeys.getInt(1));
                 }
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            BaseDao.closeConnection();
         }
         return disco;
     }
 
     @Override
-    public Disco alterar(Disco disco) {
+    protected Disco executarAlteracao(Connection con, Disco disco) throws SQLException {
         String sql = "UPDATE disco SET titulo = ?, banda = ?, estilo = ?, ano = ?, exemplares = ?, valor_aluguel = ? WHERE id = ?";
 
-        try (Connection conn = BaseDao.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setString(1, disco.getTitulo());
             stmt.setString(2, disco.getBanda());
             stmt.setString(3, disco.getEstilo());
@@ -57,41 +48,27 @@ public class DiscoDao implements BaseDao<Disco> {
             stmt.setInt(7, disco.getId());
 
             stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            BaseDao.closeConnection();
         }
         return disco;
     }
 
     @Override
-    public Disco deletar(Disco disco) {
+    protected Disco executarExclusao(Connection con, Disco disco) throws SQLException {
         String sql = "DELETE FROM disco WHERE id = ?";
 
-        try (Connection conn = BaseDao.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setInt(1, disco.getId());
             stmt.executeUpdate();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            BaseDao.closeConnection();
         }
         return disco;
     }
 
     @Override
-    public List<Disco> buscar(String parametro) {
+    protected List<Disco> executarBusca(Connection con, String parametro) throws SQLException {
         List<Disco> lista = new ArrayList<>();
         String sql = "SELECT * FROM disco WHERE titulo LIKE ? OR banda LIKE ? OR estilo LIKE ?";
 
-        try (Connection conn = BaseDao.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
-
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
             String busca = "%" + parametro + "%";
             stmt.setString(1, busca);
             stmt.setString(2, busca);
@@ -99,56 +76,39 @@ public class DiscoDao implements BaseDao<Disco> {
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    Disco d = new Disco();
-                    d.setId(rs.getInt("id"));
-                    d.setTitulo(rs.getString("titulo"));
-                    d.setBanda(rs.getString("banda"));
-                    d.setEstilo(rs.getString("estilo"));
-                    if (rs.getDate("ano") != null) {
-                        d.setAno(rs.getDate("ano").toLocalDate());
-                    }
-                    d.setExemplares(rs.getInt("exemplares"));
-                    d.setValorAluguel(rs.getFloat("valor_aluguel"));
-                    lista.add(d);
+                    lista.add(mapearDisco(rs));
                 }
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            BaseDao.closeConnection();
         }
         return lista;
     }
 
     @Override
-    public List<Disco> listar() {
+    protected List<Disco> executarListagem(Connection con) throws SQLException {
         List<Disco> lista = new ArrayList<>();
         String sql = "SELECT * FROM disco";
 
-        try (Connection conn = BaseDao.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
+        try (PreparedStatement stmt = con.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
 
             while (rs.next()) {
-                Disco d = new Disco();
-                d.setId(rs.getInt("id"));
-                d.setTitulo(rs.getString("titulo"));
-                d.setBanda(rs.getString("banda"));
-                d.setEstilo(rs.getString("estilo"));
-                if (rs.getDate("ano") != null) {
-                    d.setAno(rs.getDate("ano").toLocalDate());
-                }
-                d.setExemplares(rs.getInt("exemplares"));
-                d.setValorAluguel(rs.getFloat("valor_aluguel"));
-                lista.add(d);
+                lista.add(mapearDisco(rs));
             }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            BaseDao.closeConnection();
         }
         return lista;
+    }
+
+    private Disco mapearDisco(ResultSet rs) throws SQLException {
+        Disco d = new Disco();
+        d.setId(rs.getInt("id"));
+        d.setTitulo(rs.getString("titulo"));
+        d.setBanda(rs.getString("banda"));
+        d.setEstilo(rs.getString("estilo"));
+        if (rs.getDate("ano") != null) {
+            d.setAno(rs.getDate("ano").toLocalDate());
+        }
+        d.setExemplares(rs.getInt("exemplares"));
+        d.setValorAluguel(rs.getFloat("valor_aluguel"));
+        return d;
     }
 }

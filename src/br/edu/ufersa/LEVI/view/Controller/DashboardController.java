@@ -2,9 +2,7 @@ package br.edu.ufersa.LEVI.view.Controller;
 
 import br.edu.ufersa.LEVI.App;
 import br.edu.ufersa.LEVI.model.entity.Funcionarios;
-import br.edu.ufersa.LEVI.model.service.AluguelService;
-import br.edu.ufersa.LEVI.model.service.LivroService;
-import br.edu.ufersa.LEVI.model.service.DiscoService;
+import br.edu.ufersa.LEVI.model.service.LocadoraFacade;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -37,9 +35,10 @@ public class DashboardController {
     @FXML private Label labelAlugueisAtivos;
     @FXML private Label labelEstoque;
 
-    private final AluguelService aluguelService = new AluguelService();
-    private final LivroService livroService = new LivroService();
-    private final DiscoService discoService = new DiscoService();
+    // Antes: três Services instanciados separadamente
+    // (AluguelService, LivroService, DiscoService).
+    // Agora: uma única Facade cobre os três.
+    private final LocadoraFacade facade = new LocadoraFacade();
 
     @FXML
     public void initialize() {
@@ -60,16 +59,16 @@ public class DashboardController {
     private void carregarVisaoGeral() {
         LocalDate hoje = LocalDate.now();
 
-        float faturamento = aluguelService.calcularFaturamentoMes(hoje.getMonthValue(), hoje.getYear());
+        float faturamento = facade.calcularFaturamentoMes(hoje.getMonthValue(), hoje.getYear());
         labelFaturamento.setText(String.format("Faturamento Total: R$ %.2f", faturamento));
 
-        int totalLivros = livroService.listarLivros().size();
-        int totalDiscos = discoService.listarDiscos().size();
+        int totalLivros = facade.listarLivros().size();
+        int totalDiscos = facade.listarDiscos().size();
         int totalEstoque = totalLivros + totalDiscos;
         labelEstoque.setText(String.format("Total em Estoque: %d (%d livros, %d discos)",
                 totalEstoque, totalLivros, totalDiscos));
 
-        int alugueisAtivos = aluguelService.listar().size();
+        int alugueisAtivos = facade.listarAlugueis().size();
         labelAlugueisAtivos.setText("Aluguéis Ativos: " + alugueisAtivos);
 
         labelVisaoGeralTitulo.setText("Visão Geral (" + mesEmPortugues(hoje.getMonthValue()) + "/" + hoje.getYear() + ")");
