@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="650.0" prefWidth="1000.0" style="-fx-background-color: #F4E9DD;"
+            xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="br.edu.ufersa.LEVI.view.Controller.AlugueisController">
+
+    <!-- SIDEBAR -->
+    <left>
+        <VBox prefWidth="230.0" spacing="30.0" style="-fx-background-color: #D4A537;">
+            <padding><Insets bottom="30" left="30" right="20" top="30"/></padding>
+            <children>
+                <Label style="-fx-font-size: 22px; -fx-font-weight: bold;" text="DUDUTECA">
+                    <VBox.margin><Insets bottom="20"/></VBox.margin>
+                </Label>
+
+                <Button alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity" onAction="#abrirLivros"
+                        style="-fx-background-color: transparent; -fx-font-size: 16px; -fx-font-weight: bold;" text="Livros">
+                    <graphic><ImageView fitHeight="26.0" fitWidth="26.0" preserveRatio="true">
+                        <image><Image url="@../icons/livro.png"/></image>
+                    </ImageView></graphic>
+                </Button>
+
+                <Button alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity" onAction="#abrirDiscos"
+                        style="-fx-background-color: transparent; -fx-font-size: 16px; -fx-font-weight: bold;" text="Discos">
+                    <graphic><ImageView fitHeight="26.0" fitWidth="26.0" preserveRatio="true">
+                        <image><Image url="@../icons/disco.png"/></image>
+                    </ImageView></graphic>
+                </Button>
+
+                <Button alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity" onAction="#abrirClientes"
+                        style="-fx-background-color: transparent; -fx-font-size: 16px; -fx-font-weight: bold;" text="Clientes">
+                    <graphic><ImageView fitHeight="26.0" fitWidth="26.0" preserveRatio="true">
+                        <image><Image url="@../icons/cliente.png"/></image>
+                    </ImageView></graphic>
+                </Button>
+
+                <Button alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity" onAction="#abrirAlugueis"
+                        style="-fx-background-color: rgba(0,0,0,0.15); -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;" text="Alugueis">
+                    <graphic><ImageView fitHeight="26.0" fitWidth="26.0" preserveRatio="true">
+                        <image><Image url="@../icons/aluguel.png"/></image>
+                    </ImageView></graphic>
+                </Button>
+
+                <Button alignment="CENTER_LEFT" maxWidth="Infinity" onAction="#handleSair"
+                        style="-fx-background-color: transparent; -fx-font-size: 14px;" text="Sair">
+                    <VBox.margin><Insets top="200"/></VBox.margin>
+                </Button>
+            </children>
+        </VBox>
+    </left>
+
+    <!-- CONTEÚDO -->
+    <center>
+        <VBox spacing="16.0">
+            <padding><Insets bottom="30" left="35" right="35" top="25"/></padding>
+            <children>
+
+                <Label style="-fx-font-size: 22px; -fx-font-weight: bold;" text="Gerenciamento de Alugueis"/>
+
+                <!-- Card: Novo Aluguel -->
+                <VBox spacing="12.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #ccc; -fx-border-radius: 12;">
+                    <padding><Insets bottom="20" left="20" right="20" top="20"/></padding>
+                    <children>
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <children>
+                                <Button onAction="#handleNovoAluguel"
+                                        style="-fx-background-color: #D4A537; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16 8 16;"
+                                        text="Novo Aluguel  ＋"/>
+                            </children>
+                        </HBox>
+                        <HBox spacing="16.0" alignment="CENTER_LEFT">
+                            <children>
+                                <VBox spacing="4.0">
+                                    <children>
+                                        <Label style="-fx-font-weight: bold; -fx-text-fill: #D4A537;" text="Cliente"/>
+                                        <ComboBox fx:id="comboCliente" prefWidth="180.0" promptText="Selecionar..."
+                                                  style="-fx-border-color: #D4A537; -fx-border-radius: 4;"/>
+                                    </children>
+                                </VBox>
+                                <VBox spacing="4.0">
+                                    <children>
+                                        <Label style="-fx-font-weight: bold; -fx-text-fill: #D4A537;" text="Livro"/>
+                                        <ComboBox fx:id="comboLivro" prefWidth="180.0" promptText="Selecionar..."
+                                                  style="-fx-border-color: #D4A537; -fx-border-radius: 4;"/>
+                                        <Label style="-fx-font-weight: bold; -fx-text-fill: #D4A537;" text="Disco"/>
+                                        <ComboBox fx:id="comboDisco" prefWidth="180.0" promptText="Selecionar..."
+                                                  style="-fx-border-color: #D4A537; -fx-border-radius: 4;"/>
+                                    </children>
+                                </VBox>
+                                <VBox spacing="4.0">
+                                    <children>
+                                        <Label style="-fx-font-weight: bold; -fx-text-fill: #D4A537;" text="Datas"/>
+                                        <DatePicker fx:id="dataEmprestimo" prefWidth="160.0" promptText="Início"/>
+                                        <DatePicker fx:id="dataDevolucao" prefWidth="160.0" promptText="Devolução"/>
+                                    </children>
+                                </VBox>
+                                <VBox spacing="4.0">
+                                    <children>
+                                        <Label style="-fx-font-weight: bold; -fx-text-fill: #D4A537;" text="Valor Total"/>
+                                        <Label fx:id="labelValorTotal" style="-fx-font-size: 16px; -fx-font-weight: bold;" text="R$ 0,00"/>
+                                    </children>
+                                </VBox>
+                            </children>
+                        </HBox>
+                        <Label fx:id="labelErroForm" style="-fx-text-fill: red;"/>
+                    </children>
+                </VBox>
+
+                <!-- Botão Registrar Devolução -->
+                <HBox spacing="10.0" alignment="CENTER_LEFT">
+                    <children>
+                        <Button onAction="#handleDevolucao"
+                                style="-fx-background-color: #1E1E1E; -fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16 8 16;"
+                                text="Registrar Devolução  ↩"/>
+                        <Label fx:id="labelErro" style="-fx-text-fill: red;"/>
+                    </children>
+                </HBox>
+
+                <!-- Alugueis em Andamento -->
+                <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Alugueis em Andamento"/>
+
+                <TableView fx:id="tabelaAlugueis" VBox.vgrow="ALWAYS"
+                           style="-fx-background-color: white; -fx-border-color: #eee;">
+                    <columns>
+                        <TableColumn fx:id="colCliente" text="Cliente" prefWidth="150"/>
+                        <TableColumn fx:id="colTipo" text="Livro/Disco" prefWidth="100"/>
+                        <TableColumn fx:id="colTitulo" text="Título" prefWidth="180"/>
+                        <TableColumn fx:id="colDatas" text="Datas" prefWidth="160"/>
+                        <TableColumn fx:id="colStatus" text="Status" prefWidth="120"/>
+                    </columns>
+                </TableView>
+
+            </children>
+        </VBox>
+    </center>
+
+</BorderPane>
