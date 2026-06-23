@@ -23,7 +23,11 @@ public class App extends Application {
     public static void trocarTela(String caminhoFxml, String titulo) throws IOException {
         FXMLLoader loader = new FXMLLoader(App.class.getResource(caminhoFxml));
         Parent root = loader.load();
-        Scene scene = new Scene(root);
+
+        double largura = stagePrincipal.getScene() != null ? stagePrincipal.getScene().getWidth() : 1000;
+        double altura = stagePrincipal.getScene() != null ? stagePrincipal.getScene().getHeight() : 650;
+
+        Scene scene = new Scene(root, largura, altura);
         stagePrincipal.setScene(scene);
         stagePrincipal.setTitle(titulo);
         stagePrincipal.show();
