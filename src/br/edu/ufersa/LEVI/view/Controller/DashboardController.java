@@ -111,6 +111,11 @@ public class DashboardController {
         trocarTelaComTratamento("/br/edu/ufersa/LEVI/view/fxml/TelaLogin.fxml", "Duduteca - Login");
     }
 
+    @FXML
+    public void abrirDashboard() {
+        trocarTelaComTratamento("/br/edu/ufersa/LEVI/view/fxml/TelaDashboard.fxml", "Duduteca - Dashboard");
+    }
+
     private void trocarTelaComTratamento(String caminhoFxml, String titulo) {
         try {
             App.trocarTela(caminhoFxml, titulo);
@@ -119,4 +124,5 @@ public class DashboardController {
             labelFuncionarioLogado.setText("Tela ainda não implementada: " + caminhoFxml);
         }
     }
+
 }
