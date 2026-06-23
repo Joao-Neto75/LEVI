@@ -1,0 +1,180 @@
+package br.edu.ufersa.LEVI.view.Controller;
+
+import br.edu.ufersa.LEVI.App;
+import br.edu.ufersa.LEVI.model.entity.Aluguel;
+import br.edu.ufersa.LEVI.model.entity.Cliente;
+import br.edu.ufersa.LEVI.model.service.LocadoraFacade;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import java.util.List;
+
+public class ClientesController {
+
+    @FXML private TextField campoBuscaNome, campoBuscaCpf;
+    @FXML private Label labelErro;
+
+    @FXML private TableView<Cliente> tabelaClientes;
+    @FXML private TableColumn<Cliente, String> colNome, colCpf, colEndereco, colStatus, colItens, colAcoes;
+
+    @FXML private VBox painelFormulario;
+    @FXML private Label labelTituloForm;
+    @FXML private TextField fieldNome, fieldCpf, fieldEndereco;
+    @FXML private Label labelErroForm;
+
+    private final LocadoraFacade facade = new LocadoraFacade();
+    private Cliente clienteEmEdicao = null;
+
+    @FXML
+    public void initialize() {
+        configurarTabela();
+        carregarClientes(facade.listarClientes());
+    }
+
+    private void configurarTabela() {
+        colNome.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getNome()));
+        colCpf.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getCpf()));
+        colEndereco.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().getEndereco()));
+
+        colStatus.setCellValueFactory(c -> {
+            Cliente cliente = c.getValue();
+            List<Aluguel> alugueis = facade.buscarAlugueisPorCliente(cliente);
+            boolean atrasado = alugueis.stream().anyMatch(a ->
+                    a.getDataDevolucao() != null && a.getDataDevolucao().isBefore(LocalDate.now())
+            );
+            return new SimpleStringProperty(atrasado ? "Atrasado" : "Regular");
+        });
+
+        colItens.setCellValueFactory(c -> {
+            List<Aluguel> alugueis = facade.buscarAlugueisPorCliente(c.getValue());
+            int total = alugueis.stream().mapToInt(a -> a.getProdutos().size()).sum();
+            return new SimpleStringProperty(String.valueOf(total));
+        });
+
+        colAcoes.setCellFactory(col -> new TableCell<>() {
+            private final Button btnEditar = new Button("✏");
+            private final Button btnHistorico = new Button("📋");
+            private final HBox box = new HBox(6, btnHistorico, btnEditar);
+            {
+                btnEditar.setStyle("-fx-background-color: transparent; -fx-font-size: 14px;");
+                btnHistorico.setStyle("-fx-background-color: transparent; -fx-font-size: 14px;");
+                btnEditar.setOnAction(e -> abrirFormularioEdicao(getTableView().getItems().get(getIndex())));
+                btnHistorico.setOnAction(e -> {
+                    Cliente c = getTableView().getItems().get(getIndex());
+                    labelErro.setText("Histórico de " + c.getNome() + " — " +
+                            facade.buscarAlugueisPorCliente(c).size() + " aluguel(is)");
+                });
+            }
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty ? null : box);
+            }
+        });
+
+        // Colorir linha de atrasados
+        tabelaClientes.setRowFactory(tv -> new TableRow<>() {
+            @Override
+            protected void updateItem(Cliente item, boolean empty) {
+                super.updateItem(item, empty);
+                if (item == null || empty) {
+                    setStyle("");
+                } else {
+                    List<Aluguel> alugueis = facade.buscarAlugueisPorCliente(item);
+                    boolean atrasado = alugueis.stream().anyMatch(a ->
+                            a.getDataDevolucao() != null && a.getDataDevolucao().isBefore(LocalDate.now())
+                    );
+                    setStyle(atrasado ? "-fx-background-color: #fff0f0;" : "");
+                }
+            }
+        });
+    }
+
+    private void carregarClientes(List<Cliente> clientes) {
+        tabelaClientes.setItems(FXCollections.observableArrayList(clientes));
+    }
+
+    @FXML
+    public void handleBuscar() {
+        String nome = campoBuscaNome.getText().trim();
+        String cpf = campoBuscaCpf.getText().trim();
+        String termo = !nome.isEmpty() ? nome : cpf;
+
+        if (termo.isEmpty()) {
+            carregarClientes(facade.listarClientes());
+        } else {
+            carregarClientes(facade.pesquisarClientes(termo));
+        }
+    }
+
+    @FXML
+    public void handleAdicionar() {
+        clienteEmEdicao = null;
+        labelTituloForm.setText("Adicionar Cliente");
+        fieldNome.clear(); fieldCpf.clear(); fieldEndereco.clear();
+        labelErroForm.setText("");
+        mostrarFormulario(true);
+    }
+
+    private void abrirFormularioEdicao(Cliente cliente) {
+        clienteEmEdicao = cliente;
+        labelTituloForm.setText("Editar Cliente");
+        fieldNome.setText(cliente.getNome());
+        fieldCpf.setText(cliente.getCpf());
+        fieldEndereco.setText(cliente.getEndereco());
+        labelErroForm.setText("");
+        mostrarFormulario(true);
+    }
+
+    @FXML
+    public void handleSalvar() {
+        labelErroForm.setText("");
+        try {
+            String nome = fieldNome.getText().trim();
+            String cpf = fieldCpf.getText().trim();
+            String endereco = fieldEndereco.getText().trim();
+
+            if (nome.isEmpty() || cpf.isEmpty()) {
+                labelErroForm.setText("Nome e CPF são obrigatórios.");
+                return;
+            }
+
+            if (clienteEmEdicao == null) {
+                Cliente novo = new Cliente(nome, endereco, cpf);
+                facade.salvarCliente(novo);
+            } else {
+                clienteEmEdicao.atualizarNome(nome);
+                clienteEmEdicao.setCpf(cpf);
+                clienteEmEdicao.atualizarEndereco(endereco);
+                facade.atualizarCliente(clienteEmEdicao);
+            }
+
+            mostrarFormulario(false);
+            carregarClientes(facade.listarClientes());
+
+        } catch (Exception e) {
+            labelErroForm.setText("Erro: " + e.getMessage());
+        }
+    }
+
+    @FXML public void handleCancelar() { mostrarFormulario(false); }
+
+    private void mostrarFormulario(boolean v) { painelFormulario.setVisible(v); painelFormulario.setManaged(v); }
+
+    @FXML public void abrirLivros() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaLivros.fxml", "Duduteca - Livros"); }
+    @FXML public void abrirDiscos() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaDiscos.fxml", "Duduteca - Discos"); }
+    @FXML public void abrirClientes() { /* já estamos aqui */ }
+    @FXML public void abrirAlugueis() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaAlugueis.fxml", "Duduteca - Aluguéis"); }
+    @FXML public void handleSair() { SessaoUsuario.encerrarSessao(); navegar("/br/edu/ufersa/LEVI/view/fxml/TelaLogin.fxml", "Duduteca - Login"); }
+
+    private void navegar(String fxml, String titulo) {
+        try { App.trocarTela(fxml, titulo); }
+        catch (IOException e) { labelErro.setText("Tela não implementada: " + fxml); }
+    }
+}
