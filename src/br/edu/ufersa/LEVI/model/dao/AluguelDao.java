@@ -79,7 +79,7 @@ public class AluguelDao extends AbstractDao<Aluguel> {
     protected List<Aluguel> executarBusca(Connection con, String parametro) throws SQLException {
         // busca por CPF ou nome do cliente
         String sql = "SELECT a.* FROM alugueis a " +
-                "JOIN clientes c ON a.cliente_id = c.id " +
+                "JOIN cliente c ON a.cliente_id = c.id " +
                 "WHERE c.cpf LIKE ? OR c.nome LIKE ?";
         List<Aluguel> lista = new ArrayList<>();
 
