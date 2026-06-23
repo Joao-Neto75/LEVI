@@ -1,160 +1,137 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.image.*?>
-<?import javafx.scene.layout.*?>
+        <?import javafx.geometry.*?>
+        <?import javafx.scene.control.*?>
+        <?import javafx.scene.image.*?>
+        <?import javafx.scene.layout.*?>
 
-<BorderPane prefHeight="650.0" prefWidth="1000.0" style="-fx-background-color: #F4E9DD;"
+<BorderPane prefHeight="650.0" prefWidth="1000.0" style="-fx-background-color: #F4E9DD; -fx-font-family: 'Segoe UI', Arial, sans-serif;"
             xmlns="http://javafx.com/javafx/8"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="br.edu.ufersa.LEVI.view.Controller.DiscosController">
 
-    <!-- SIDEBAR -->
-    <left>
-        <VBox prefWidth="230.0" spacing="30.0" style="-fx-background-color: #D4A537;">
-            <padding><Insets bottom="30" left="30" right="20" top="30"/></padding>
-            <children>
-                <Label style="-fx-font-size: 22px; -fx-font-weight: bold;" text="DUDUTECA">
-                    <VBox.margin><Insets bottom="20"/></VBox.margin>
-                </Label>
+<left>
+    <VBox prefWidth="220.0" spacing="8.0" style="-fx-background-color: #D4A537;">
+        <padding><Insets bottom="30" left="20" right="20" top="30"/></padding>
+        <children>
+            <Button onAction="#abrirDashboard" maxWidth="Infinity" alignment="CENTER_LEFT"
+                    style="-fx-background-color: transparent; -fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1E1E1E; -fx-cursor: hand; -fx-padding: 0;"
+                    text="DUDUTECA">
+                <VBox.margin><Insets bottom="24"/></VBox.margin>
+            </Button>
+            <Button alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity" onAction="#abrirLivros"
+                    style="-fx-background-color: transparent; -fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1E1E1E; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 10 12 10 12;" text="Livros">
+                <graphic><ImageView fitHeight="24.0" fitWidth="24.0" preserveRatio="true"><image><Image url="@../icons/livro.png"/></image></ImageView></graphic>
+            </Button>
+            <Button alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity" onAction="#abrirDiscos"
+                    style="-fx-background-color: rgba(0,0,0,0.12); -fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1E1E1E; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 10 12 10 12;" text="Discos">
+                <graphic><ImageView fitHeight="24.0" fitWidth="24.0" preserveRatio="true"><image><Image url="@../icons/disco.png"/></image></ImageView></graphic>
+            </Button>
+            <Button alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity" onAction="#abrirClientes"
+                    style="-fx-background-color: transparent; -fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1E1E1E; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 10 12 10 12;" text="Clientes">
+                <graphic><ImageView fitHeight="24.0" fitWidth="24.0" preserveRatio="true"><image><Image url="@../icons/cliente.png"/></image></ImageView></graphic>
+            </Button>
+            <Button alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity" onAction="#abrirAlugueis"
+                    style="-fx-background-color: transparent; -fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1E1E1E; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 10 12 10 12;" text="Alugueis">
+                <graphic><ImageView fitHeight="24.0" fitWidth="24.0" preserveRatio="true"><image><Image url="@../icons/aluguel.png"/></image></ImageView></graphic>
+            </Button>
+            <Button alignment="CENTER_LEFT" maxWidth="Infinity" onAction="#handleSair"
+                    style="-fx-background-color: transparent; -fx-font-size: 13px; -fx-text-fill: #1E1E1E; -fx-cursor: hand; -fx-padding: 10 12 10 12;" text="Sair">
+                <VBox.margin><Insets top="180"/></VBox.margin>
+            </Button>
+        </children>
+    </VBox>
+</left>
 
-                <Button fx:id="botaoLivros" alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity"
-                        onAction="#abrirLivros"
-                        style="-fx-background-color: transparent; -fx-font-size: 16px; -fx-font-weight: bold;" text="Livros">
-                    <graphic><ImageView fitHeight="26.0" fitWidth="26.0" preserveRatio="true">
-                        <image><Image url="@../icons/livro.png"/></image>
-                    </ImageView></graphic>
-                </Button>
+<center>
+    <VBox spacing="16.0">
+        <padding><Insets bottom="30" left="30" right="30" top="24"/></padding>
+        <children>
+            <Label style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #1E1E1E;" text="Gerenciamento de Discos"/>
 
-                <Button fx:id="botaoDiscos" alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity"
-                        onAction="#abrirDiscos"
-                        style="-fx-background-color: rgba(0,0,0,0.15); -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;" text="Discos">
-                    <graphic><ImageView fitHeight="26.0" fitWidth="26.0" preserveRatio="true">
-                        <image><Image url="@../icons/disco.png"/></image>
-                    </ImageView></graphic>
-                </Button>
+            <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2);" maxWidth="440.0">
+                <padding><Insets bottom="14" left="16" right="16" top="14"/></padding>
+                <children>
+                    <HBox spacing="10.0" alignment="CENTER_LEFT">
+                        <children>
+                            <Label style="-fx-font-weight: bold; -fx-text-fill: #D4A537; -fx-font-size: 13px;" text="Título:"/>
+                            <TextField fx:id="campoBuscaTitulo" promptText="Nome..." prefWidth="240.0"
+                                       style="-fx-border-color: #D4A537; -fx-border-radius: 6; -fx-background-radius: 6; -fx-font-size: 13px;"/>
+                            <Button onAction="#handleBuscar" style="-fx-background-color: transparent; -fx-cursor: hand;" text="🔍"/>
+                        </children>
+                    </HBox>
+                    <HBox spacing="10.0" alignment="CENTER_LEFT">
+                        <children>
+                            <Label style="-fx-font-weight: bold; -fx-text-fill: #D4A537; -fx-font-size: 13px;" text="Banda:"/>
+                            <TextField fx:id="campoBuscaBanda" promptText="Digite..." prefWidth="240.0"
+                                       style="-fx-border-color: #D4A537; -fx-border-radius: 6; -fx-background-radius: 6; -fx-font-size: 13px;"/>
+                            <Button onAction="#handleBuscar" style="-fx-background-color: transparent; -fx-cursor: hand;" text="🔍"/>
+                        </children>
+                    </HBox>
+                    <HBox spacing="10.0" alignment="CENTER_LEFT">
+                        <children>
+                            <Label style="-fx-font-weight: bold; -fx-text-fill: #D4A537; -fx-font-size: 13px;" text="Estilo:"/>
+                            <ComboBox fx:id="comboEstilo" prefWidth="240.0" promptText="Estilo"
+                                      style="-fx-border-color: #D4A537; -fx-border-radius: 6; -fx-font-size: 13px;"/>
+                        </children>
+                    </HBox>
+                </children>
+            </VBox>
 
-                <Button fx:id="botaoClientes" alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity"
-                        onAction="#abrirClientes"
-                        style="-fx-background-color: transparent; -fx-font-size: 16px; -fx-font-weight: bold;" text="Clientes">
-                    <graphic><ImageView fitHeight="26.0" fitWidth="26.0" preserveRatio="true">
-                        <image><Image url="@../icons/cliente.png"/></image>
-                    </ImageView></graphic>
-                </Button>
+            <HBox alignment="CENTER_LEFT" spacing="12.0">
+                <children>
+                    <Button fx:id="botaoAdicionar" onAction="#handleAdicionar"
+                            style="-fx-background-color: #D4A537; -fx-font-size: 14px; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 9 18 9 18; -fx-cursor: hand; -fx-text-fill: #1E1E1E;"
+                            text="Adicionar Disco  ＋"/>
+                    <Label fx:id="labelErro" style="-fx-text-fill: #cc0000; -fx-font-size: 13px;"/>
+                </children>
+            </HBox>
 
-                <Button fx:id="botaoAlugueis" alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity"
-                        onAction="#abrirAlugueis"
-                        style="-fx-background-color: transparent; -fx-font-size: 16px; -fx-font-weight: bold;" text="Alugueis">
-                    <graphic><ImageView fitHeight="26.0" fitWidth="26.0" preserveRatio="true">
-                        <image><Image url="@../icons/aluguel.png"/></image>
-                    </ImageView></graphic>
-                </Button>
+            <TableView fx:id="tabelaDiscos" VBox.vgrow="ALWAYS"
+                       style="-fx-background-color: white; -fx-background-radius: 10; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.07), 8, 0, 0, 2); -fx-font-size: 13px;">
+                <columns>
+                    <TableColumn fx:id="colTitulo" text="Título" prefWidth="180"/>
+                    <TableColumn fx:id="colBanda" text="Banda/Cantor" prefWidth="150"/>
+                    <TableColumn fx:id="colEstilo" text="Estilo" prefWidth="100"/>
+                    <TableColumn fx:id="colExemplares" text="Exemplares" prefWidth="90"/>
+                    <TableColumn fx:id="colAno" text="Ano" prefWidth="65"/>
+                    <TableColumn fx:id="colValor" text="Valor de Aluguel" prefWidth="120"/>
+                    <TableColumn fx:id="colAcoes" text="Ações" prefWidth="80"/>
+                </columns>
+            </TableView>
+        </children>
+    </VBox>
+</center>
 
-                <Button fx:id="botaoSair" alignment="CENTER_LEFT" maxWidth="Infinity"
-                        onAction="#handleSair"
-                        style="-fx-background-color: transparent; -fx-font-size: 14px;" text="Sair">
-                    <VBox.margin><Insets top="200"/></VBox.margin>
-                </Button>
-            </children>
-        </VBox>
-    </left>
-
-    <!-- CONTEÚDO -->
-    <center>
-        <VBox spacing="16.0">
-            <padding><Insets bottom="30" left="35" right="35" top="25"/></padding>
-            <children>
-
-                <Label style="-fx-font-size: 22px; -fx-font-weight: bold;" text="Gerenciamento de Discos"/>
-
-                <!-- Filtros -->
-                <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #ccc; -fx-border-radius: 12;" maxWidth="400.0">
-                    <padding><Insets bottom="15" left="15" right="15" top="15"/></padding>
-                    <children>
-                        <HBox spacing="10.0" alignment="CENTER_LEFT">
-                            <children>
-                                <Label style="-fx-font-weight: bold; -fx-text-fill: #D4A537;" text="Título:"/>
-                                <TextField fx:id="campoBuscaTitulo" promptText="Nome..." prefWidth="220.0"
-                                           style="-fx-border-color: #D4A537; -fx-border-radius: 4; -fx-background-radius: 4;"/>
-                                <Button onAction="#handleBuscar" style="-fx-background-color: transparent;" text="🔍"/>
-                            </children>
-                        </HBox>
-                        <HBox spacing="10.0" alignment="CENTER_LEFT">
-                            <children>
-                                <Label style="-fx-font-weight: bold; -fx-text-fill: #D4A537;" text="Banda:"/>
-                                <TextField fx:id="campoBuscaBanda" promptText="Digite..." prefWidth="220.0"
-                                           style="-fx-border-color: #D4A537; -fx-border-radius: 4; -fx-background-radius: 4;"/>
-                                <Button onAction="#handleBuscar" style="-fx-background-color: transparent;" text="🔍"/>
-                            </children>
-                        </HBox>
-                        <HBox spacing="10.0" alignment="CENTER_LEFT">
-                            <children>
-                                <Label style="-fx-font-weight: bold; -fx-text-fill: #D4A537;" text="Estilo:"/>
-                                <ComboBox fx:id="comboEstilo" prefWidth="220.0" promptText="Estilo"
-                                          style="-fx-border-color: #D4A537; -fx-border-radius: 4;"/>
-                            </children>
-                        </HBox>
-                    </children>
-                </VBox>
-
-                <!-- Botão Adicionar -->
-                <HBox alignment="CENTER_LEFT" spacing="10.0">
-                    <children>
-                        <Button fx:id="botaoAdicionar" onAction="#handleAdicionar"
-                                style="-fx-background-color: #D4A537; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16 8 16;"
-                                text="Adicionar Disco  ＋"/>
-                        <Label fx:id="labelErro" style="-fx-text-fill: red;"/>
-                    </children>
-                </HBox>
-
-                <!-- Tabela -->
-                <TableView fx:id="tabelaDiscos" VBox.vgrow="ALWAYS"
-                           style="-fx-background-color: white; -fx-border-color: #eee;">
-                    <columns>
-                        <TableColumn fx:id="colTitulo" text="Título" prefWidth="180"/>
-                        <TableColumn fx:id="colBanda" text="Banda/Cantor" prefWidth="150"/>
-                        <TableColumn fx:id="colEstilo" text="Estilo" prefWidth="100"/>
-                        <TableColumn fx:id="colExemplares" text="Exemplares" prefWidth="90"/>
-                        <TableColumn fx:id="colAno" text="Ano" prefWidth="70"/>
-                        <TableColumn fx:id="colValor" text="Valor de Aluguel" prefWidth="120"/>
-                        <TableColumn fx:id="colAcoes" text="Ações" prefWidth="80"/>
-                    </columns>
-                </TableView>
-
-            </children>
-        </VBox>
-    </center>
-
-    <!-- DIALOG: Adicionar/Editar Disco -->
-    <bottom>
-        <VBox fx:id="painelFormulario" visible="false" managed="false"
-              style="-fx-background-color: rgba(0,0,0,0.5);" alignment="CENTER">
-            <children>
-                <VBox spacing="12.0" maxWidth="420.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 24;">
-                    <children>
-                        <Label fx:id="labelTituloForm" style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Adicionar Disco"/>
-                        <TextField fx:id="fieldTitulo" promptText="Título"/>
-                        <TextField fx:id="fieldBanda" promptText="Banda/Cantor"/>
-                        <TextField fx:id="fieldEstilo" promptText="Estilo (ex: Rock, Pop)"/>
-                        <TextField fx:id="fieldAno" promptText="Ano (ex: 1980-01-01)"/>
-                        <TextField fx:id="fieldExemplares" promptText="Exemplares"/>
-                        <TextField fx:id="fieldValor" promptText="Valor de Aluguel (ex: 25.00)"/>
-                        <Label fx:id="labelErroForm" style="-fx-text-fill: red;"/>
-                        <HBox spacing="10.0" alignment="CENTER_RIGHT">
-                            <children>
-                                <Button onAction="#handleCancelar"
-                                        style="-fx-background-color: #ccc; -fx-background-radius: 6; -fx-padding: 8 16 8 16;"
-                                        text="Cancelar"/>
-                                <Button onAction="#handleSalvar"
-                                        style="-fx-background-color: #D4A537; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16 8 16;"
-                                        text="Salvar"/>
-                            </children>
-                        </HBox>
-                    </children>
-                </VBox>
-            </children>
-        </VBox>
-    </bottom>
+<bottom>
+    <VBox fx:id="painelFormulario" visible="false" managed="false" alignment="CENTER"
+          style="-fx-background-color: rgba(0,0,0,0.45);">
+        <children>
+            <VBox spacing="12.0" maxWidth="440.0"
+                  style="-fx-background-color: white; -fx-background-radius: 14; -fx-padding: 28; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 16, 0, 0, 4);">
+                <children>
+                    <Label fx:id="labelTituloForm" style="-fx-font-size: 17px; -fx-font-weight: bold;" text="Adicionar Disco"/>
+                    <TextField fx:id="fieldTitulo" promptText="Título" style="-fx-font-size: 13px;"/>
+                    <TextField fx:id="fieldBanda" promptText="Banda/Cantor" style="-fx-font-size: 13px;"/>
+                    <TextField fx:id="fieldEstilo" promptText="Estilo (ex: Rock, Pop)" style="-fx-font-size: 13px;"/>
+                    <TextField fx:id="fieldAno" promptText="Ano (ex: 1980-01-01)" style="-fx-font-size: 13px;"/>
+                    <TextField fx:id="fieldExemplares" promptText="Exemplares" style="-fx-font-size: 13px;"/>
+                    <TextField fx:id="fieldValor" promptText="Valor de Aluguel (ex: 25.00)" style="-fx-font-size: 13px;"/>
+                    <Label fx:id="labelErroForm" style="-fx-text-fill: #cc0000; -fx-font-size: 12px;"/>
+                    <HBox spacing="10.0" alignment="CENTER_RIGHT">
+                        <children>
+                            <Button onAction="#handleCancelar"
+                                    style="-fx-background-color: #e0e0e0; -fx-background-radius: 8; -fx-padding: 8 18 8 18; -fx-font-size: 13px; -fx-cursor: hand;"
+                                    text="Cancelar"/>
+                            <Button onAction="#handleSalvar"
+                                    style="-fx-background-color: #D4A537; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 8 18 8 18; -fx-font-size: 13px; -fx-cursor: hand;"
+                                    text="Salvar"/>
+                        </children>
+                    </HBox>
+                </children>
+            </VBox>
+        </children>
+    </VBox>
+</bottom>
 
 </BorderPane>
