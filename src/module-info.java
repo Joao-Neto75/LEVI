@@ -1,4 +1,4 @@
-module LEVI {
+module br.edu.ufersa.LEVI {
 
     requires javafx.controls;
     requires javafx.fxml;
@@ -9,5 +9,4 @@ module LEVI {
 
     exports br.edu.ufersa.LEVI;
     exports br.edu.ufersa.LEVI.view.Controller;
-
 }

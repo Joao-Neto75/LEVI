@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="650.0" prefWidth="1000.0" style="-fx-background-color: #F4E9DD;"
+            xmlns="http://javafx.com/javafx/8"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="br.edu.ufersa.LEVI.view.Controller.LivrosController">
+
+    <!-- SIDEBAR -->
+    <left>
+        <VBox prefWidth="230.0" spacing="30.0" style="-fx-background-color: #D4A537;">
+            <padding><Insets bottom="30" left="30" right="20" top="30"/></padding>
+            <children>
+                <Label style="-fx-font-size: 22px; -fx-font-weight: bold;" text="DUDUTECA">
+                    <VBox.margin><Insets bottom="20"/></VBox.margin>
+                </Label>
+
+                <Button fx:id="botaoLivros" alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity"
+                        onAction="#abrirLivros"
+                        style="-fx-background-color: rgba(0,0,0,0.15); -fx-font-size: 16px; -fx-font-weight: bold; -fx-background-radius: 8;" text="Livros">
+                    <graphic>
+                        <ImageView fitHeight="26.0" fitWidth="26.0" preserveRatio="true">
+                            <image><Image url="@../icons/livro.png"/></image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+
+                <Button fx:id="botaoDiscos" alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity"
+                        onAction="#abrirDiscos"
+                        style="-fx-background-color: transparent; -fx-font-size: 16px; -fx-font-weight: bold;" text="Discos">
+                    <graphic>
+                        <ImageView fitHeight="26.0" fitWidth="26.0" preserveRatio="true">
+                            <image><Image url="@../icons/disco.png"/></image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+
+                <Button fx:id="botaoClientes" alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity"
+                        onAction="#abrirClientes"
+                        style="-fx-background-color: transparent; -fx-font-size: 16px; -fx-font-weight: bold;" text="Clientes">
+                    <graphic>
+                        <ImageView fitHeight="26.0" fitWidth="26.0" preserveRatio="true">
+                            <image><Image url="@../icons/cliente.png"/></image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+
+                <Button fx:id="botaoAlugueis" alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity"
+                        onAction="#abrirAlugueis"
+                        style="-fx-background-color: transparent; -fx-font-size: 16px; -fx-font-weight: bold;" text="Alugueis">
+                    <graphic>
+                        <ImageView fitHeight="26.0" fitWidth="26.0" preserveRatio="true">
+                            <image><Image url="@../icons/aluguel.png"/></image>
+                        </ImageView>
+                    </graphic>
+                </Button>
+
+                <Button fx:id="botaoSair" alignment="CENTER_LEFT" maxWidth="Infinity"
+                        onAction="#handleSair"
+                        style="-fx-background-color: transparent; -fx-font-size: 14px;" text="Sair">
+                    <VBox.margin><Insets top="200"/></VBox.margin>
+                </Button>
+            </children>
+        </VBox>
+    </left>
+
+    <!-- CONTEÚDO -->
+    <center>
+        <VBox spacing="16.0">
+            <padding><Insets bottom="30" left="35" right="35" top="25"/></padding>
+            <children>
+
+                <!-- Título -->
+                <Label style="-fx-font-size: 22px; -fx-font-weight: bold;" text="Gerenciamento de livros"/>
+
+                <!-- Filtros -->
+                <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #ccc; -fx-border-radius: 12;" maxWidth="400.0">
+                    <padding><Insets bottom="15" left="15" right="15" top="15"/></padding>
+                    <children>
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <children>
+                                <Label style="-fx-font-weight: bold; -fx-text-fill: #D4A537;" text="Título:"/>
+                                <TextField fx:id="campoBuscaTitulo" promptText="Nome..." prefWidth="220.0"
+                                           style="-fx-border-color: #D4A537; -fx-border-radius: 4; -fx-background-radius: 4;"/>
+                                <Button onAction="#handleBuscar" style="-fx-background-color: transparent;" text="🔍"/>
+                            </children>
+                        </HBox>
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <children>
+                                <Label style="-fx-font-weight: bold; -fx-text-fill: #D4A537;" text="Gênero:"/>
+                                <ComboBox fx:id="comboGenero" prefWidth="220.0" promptText="Gênero"
+                                          style="-fx-border-color: #D4A537; -fx-border-radius: 4;"/>
+                            </children>
+                        </HBox>
+                        <HBox spacing="10.0" alignment="CENTER_LEFT">
+                            <children>
+                                <Label style="-fx-font-weight: bold; -fx-text-fill: #D4A537;" text="Autor:"/>
+                                <TextField fx:id="campoBuscaAutor" promptText="Nome..." prefWidth="220.0"
+                                           style="-fx-border-color: #D4A537; -fx-border-radius: 4; -fx-background-radius: 4;"/>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+
+                <!-- Botão Adicionar -->
+                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                    <children>
+                        <Button fx:id="botaoAdicionar" onAction="#handleAdicionar"
+                                style="-fx-background-color: #D4A537; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16 8 16;"
+                                text="Adicionar Livro  ＋"/>
+                        <Label fx:id="labelErro" style="-fx-text-fill: red;"/>
+                    </children>
+                </HBox>
+
+                <!-- Tabela -->
+                <TableView fx:id="tabelaLivros" VBox.vgrow="ALWAYS"
+                           style="-fx-background-color: white; -fx-border-color: #eee;">
+                    <columns>
+                        <TableColumn fx:id="colTitulo" text="Título" prefWidth="180"/>
+                        <TableColumn fx:id="colAutor" text="Autor" prefWidth="150"/>
+                        <TableColumn fx:id="colGenero" text="Gênero" prefWidth="130"/>
+                        <TableColumn fx:id="colAno" text="Ano" prefWidth="70"/>
+                        <TableColumn fx:id="colExemplares" text="Exemplares" prefWidth="90"/>
+                        <TableColumn fx:id="colValor" text="Valor de Aluguel" prefWidth="120"/>
+                        <TableColumn fx:id="colAcoes" text="Ações" prefWidth="80"/>
+                    </columns>
+                </TableView>
+
+            </children>
+        </VBox>
+    </center>
+
+    <!-- DIALOG: Adicionar/Editar Livro (oculto por padrão) -->
+    <bottom>
+        <VBox fx:id="painelFormulario" visible="false" managed="false"
+              style="-fx-background-color: rgba(0,0,0,0.5);" alignment="CENTER">
+            <children>
+                <VBox spacing="12.0" maxWidth="420.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-padding: 24;">
+                    <children>
+                        <Label fx:id="labelTituloForm" style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Adicionar Livro"/>
+                        <TextField fx:id="fieldTitulo" promptText="Título"/>
+                        <TextField fx:id="fieldAutor" promptText="Autor"/>
+                        <TextField fx:id="fieldGenero" promptText="Gênero"/>
+                        <TextField fx:id="fieldAno" promptText="Ano (ex: 1997-01-01)"/>
+                        <TextField fx:id="fieldPaginas" promptText="Páginas"/>
+                        <TextField fx:id="fieldExemplares" promptText="Exemplares"/>
+                        <TextField fx:id="fieldValor" promptText="Valor de Aluguel (ex: 20.00)"/>
+                        <Label fx:id="labelErroForm" style="-fx-text-fill: red;"/>
+                        <HBox spacing="10.0" alignment="CENTER_RIGHT">
+                            <children>
+                                <Button onAction="#handleCancelar"
+                                        style="-fx-background-color: #ccc; -fx-background-radius: 6; -fx-padding: 8 16 8 16;"
+                                        text="Cancelar"/>
+                                <Button onAction="#handleSalvar"
+                                        style="-fx-background-color: #D4A537; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 8 16 8 16;"
+                                        text="Salvar"/>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+        </VBox>
+    </bottom>
+
+</BorderPane>
