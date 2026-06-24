@@ -11,7 +11,10 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.VBox;
+import javafx.util.StringConverter;
 
+import java.awt.Desktop;
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
@@ -34,16 +37,18 @@ public class RelatorioController {
 
     // Card de gerar relatório
     @FXML private ComboBox<String> comboFiltro;
-    @FXML private TextField campoBuscaCliente;
+    @FXML private ComboBox<Cliente> comboCliente;
     @FXML private Button botaoGerar;
+    @FXML private Button botaoGerarPdf;
     @FXML private Label labelErro;
+    @FXML private Label labelSucesso;
 
     // Cabeçalho do cliente (some/aparece dependendo do filtro)
     @FXML private VBox boxCabecalhoCliente;
     @FXML private Label labelTituloRelatorioCliente;
     @FXML private Label labelDadosCliente;
 
-    // Tabela
+    // Tabela (prévia em tela, antes de exportar o PDF)
     @FXML private TableView<LinhaRelatorio> tabelaResultado;
     @FXML private TableColumn<LinhaRelatorio, String> colunaCliente;
     @FXML private TableColumn<LinhaRelatorio, String> colunaItem;
@@ -55,15 +60,22 @@ public class RelatorioController {
     private static final String FILTRO_TODO = "Todo";
 
     private final LocadoraFacade facade = new LocadoraFacade();
+    private final GeradorPdfRelatorio geradorPdf = new GeradorPdfRelatorio();
 
     private int mesSelecionado;
     private int anoSelecionado;
+
+    // guarda o último resultado gerado, para o botão de PDF usar sem recalcular
+    private List<LinhaRelatorio> ultimasLinhasGeradas = List.of();
+    private String ultimoTituloGerado = "";
+    private String ultimoSubtituloGerado = "";
 
     @FXML
     public void initialize() {
         configurarColunasTabela();
         configurarComboMesAno();
         configurarComboFiltro();
+        configurarComboCliente();
         carregarFaturamentoDoMes();
     }
 
@@ -82,7 +94,6 @@ public class RelatorioController {
         anoSelecionado = hoje.getYear();
 
         ObservableList<String> opcoes = FXCollections.observableArrayList();
-        // gera os últimos 12 meses, do mais recente para o mais antigo
         LocalDate cursor = hoje;
         for (int i = 0; i < 12; i++) {
             opcoes.add(formatarMesAno(cursor.getMonthValue(), cursor.getYear()));
@@ -96,7 +107,27 @@ public class RelatorioController {
     private void configurarComboFiltro() {
         comboFiltro.setItems(FXCollections.observableArrayList(FILTRO_TODO, "Cliente específico"));
         comboFiltro.getSelectionModel().select(FILTRO_TODO);
-        atualizarEstadoCampoBusca();
+        atualizarEstadoComboCliente();
+    }
+
+    // Carrega todos os clientes do banco no ComboBox, exibindo "Nome — CPF"
+    private void configurarComboCliente() {
+        List<Cliente> clientes = facade.listarClientes();
+        comboCliente.setItems(FXCollections.observableArrayList(clientes));
+
+        comboCliente.setConverter(new StringConverter<Cliente>() {
+            @Override
+            public String toString(Cliente cliente) {
+                if (cliente == null) return "";
+                return cliente.getNome() + " — " + cliente.getCpf();
+            }
+
+            @Override
+            public Cliente fromString(String string) {
+                // não é necessário converter de volta: o ComboBox não é editável
+                return null;
+            }
+        });
     }
 
     @FXML
@@ -113,20 +144,21 @@ public class RelatorioController {
 
     @FXML
     public void handleMudarFiltro() {
-        atualizarEstadoCampoBusca();
+        atualizarEstadoComboCliente();
     }
 
-    private void atualizarEstadoCampoBusca() {
+    private void atualizarEstadoComboCliente() {
         boolean ehFiltroTodo = FILTRO_TODO.equals(comboFiltro.getValue());
-        campoBuscaCliente.setDisable(ehFiltroTodo);
+        comboCliente.setDisable(ehFiltroTodo);
         if (ehFiltroTodo) {
-            campoBuscaCliente.clear();
+            comboCliente.getSelectionModel().clearSelection();
         }
     }
 
     @FXML
     public void handleGerarRelatorio() {
         labelErro.setText("");
+        labelSucesso.setText("");
 
         if (FILTRO_TODO.equals(comboFiltro.getValue())) {
             gerarRelatorioGeral();
@@ -142,39 +174,33 @@ public class RelatorioController {
         colunaCliente.setVisible(true);
 
         List<Aluguel> alugueis = facade.buscarAlugueisPorMes(mesSelecionado, anoSelecionado);
-        montarTabela(alugueis);
+        List<LinhaRelatorio> linhas = montarLinhas(alugueis);
+        tabelaResultado.setItems(FXCollections.observableArrayList(linhas));
+
+        ultimasLinhasGeradas = linhas;
+        ultimoTituloGerado = "Relatório Geral de Aluguéis";
+        ultimoSubtituloGerado = "Período: " + comboMesAno.getValue();
     }
 
-    // Filtro "Cliente específico": busca o cliente pelo nome/CPF digitado e mostra só os aluguéis dele
+    // Filtro "Cliente específico": usa o cliente escolhido no ComboBox
     private void gerarRelatorioPorCliente() {
-        String termo = campoBuscaCliente.getText();
+        Cliente cliente = comboCliente.getValue();
 
-        if (termo == null || termo.trim().isEmpty()) {
-            labelErro.setText("Digite o nome ou CPF do cliente para gerar o relatório.");
+        if (cliente == null) {
+            labelErro.setText("Selecione um cliente para gerar o relatório.");
             return;
-        }
-
-        List<Cliente> encontrados = facade.pesquisarClientes(termo);
-
-        if (encontrados.isEmpty()) {
-            labelErro.setText("Nenhum cliente encontrado com esse nome ou CPF.");
-            tabelaResultado.getItems().clear();
-            boxCabecalhoCliente.setVisible(false);
-            boxCabecalhoCliente.setManaged(false);
-            return;
-        }
-
-        // usa o primeiro resultado encontrado; se houver mais de um, avisa no rótulo de erro
-        Cliente cliente = encontrados.get(0);
-        if (encontrados.size() > 1) {
-            labelErro.setText("Mais de um cliente encontrado. Mostrando o relatório de: " + cliente.getNome());
         }
 
         exibirCabecalhoCliente(cliente);
 
         colunaCliente.setVisible(false);
         List<Aluguel> alugueis = facade.buscarAlugueisPorCliente(cliente);
-        montarTabela(alugueis);
+        List<LinhaRelatorio> linhas = montarLinhas(alugueis);
+        tabelaResultado.setItems(FXCollections.observableArrayList(linhas));
+
+        ultimasLinhasGeradas = linhas;
+        ultimoTituloGerado = "Relatório de " + cliente.getNome();
+        ultimoSubtituloGerado = "CPF: " + cliente.getCpf() + "    Endereço: " + cliente.getEndereco();
     }
 
     private void exibirCabecalhoCliente(Cliente cliente) {
@@ -184,9 +210,9 @@ public class RelatorioController {
         labelDadosCliente.setText("CPF: " + cliente.getCpf() + "    Endereço: " + cliente.getEndereco());
     }
 
-    // Converte a lista de Aluguel (cada um com vários produtos) em linhas individuais para a tabela
-    private void montarTabela(List<Aluguel> alugueis) {
-        ObservableList<LinhaRelatorio> linhas = FXCollections.observableArrayList();
+    // Converte a lista de Aluguel (cada um com vários produtos) em linhas individuais
+    private List<LinhaRelatorio> montarLinhas(List<Aluguel> alugueis) {
+        List<LinhaRelatorio> linhas = new java.util.ArrayList<>();
 
         for (Aluguel aluguel : alugueis) {
             String nomeCliente = aluguel.getCliente() != null ? aluguel.getCliente().getNome() : "—";
@@ -197,12 +223,44 @@ public class RelatorioController {
                         produto.getDescricao(),
                         aluguel.getDataEmprestimo(),
                         aluguel.getDataDevolucao(),
+                        aluguel.getStatus(),
                         produto.getValorAluguel()
                 ));
             }
         }
+        return linhas;
+    }
 
-        tabelaResultado.setItems(linhas);
+    // Gera o PDF a partir do último relatório exibido na tela e salva em Downloads
+    @FXML
+    public void handleGerarPdf() {
+        labelErro.setText("");
+        labelSucesso.setText("");
+
+        if (ultimasLinhasGeradas.isEmpty() && tabelaResultado.getItems().isEmpty()) {
+            labelErro.setText("Gere o relatório na tela antes de exportar o PDF.");
+            return;
+        }
+
+        float faturamentoPeriodo = 0;
+        for (LinhaRelatorio linha : ultimasLinhasGeradas) {
+            faturamentoPeriodo += linha.getValor();
+        }
+
+        try {
+            File arquivo = geradorPdf.gerar(ultimoTituloGerado, ultimoSubtituloGerado,
+                    ultimasLinhasGeradas, faturamentoPeriodo);
+
+            labelSucesso.setText("PDF salvo em: " + arquivo.getAbsolutePath());
+
+            // Abre o PDF automaticamente no leitor padrão do sistema, se disponível
+            if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
+                Desktop.getDesktop().open(arquivo);
+            }
+
+        } catch (IOException e) {
+            labelErro.setText("Erro ao gerar o PDF: " + e.getMessage());
+        }
     }
 
     private void carregarFaturamentoDoMes() {
@@ -215,7 +273,6 @@ public class RelatorioController {
 
         for (Aluguel aluguel : alugueis) {
             for (Produto produto : aluguel.getProdutos()) {
-                // Distingue livro de disco pela classe concreta, já que Produto é abstrata
                 if (produto.getClass().getSimpleName().equalsIgnoreCase("Livro")) {
                     totalLivros++;
                 } else {

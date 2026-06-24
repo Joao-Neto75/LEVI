@@ -52,7 +52,7 @@ public class DashboardController {
     private void exibirFuncionarioLogado() {
         Funcionarios logado = SessaoUsuario.getFuncionarioLogado();
         if (logado != null) {
-            labelFuncionarioLogado.setText("Olá, " + logado.getNome());
+
         }
     }
 

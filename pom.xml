@@ -29,6 +29,12 @@
             <artifactId>javafx-fxml</artifactId>
             <version>22</version>
         </dependency>
+        <!-- Apache PDFBox: usado para gerar o relatório em PDF na tela de Relatório -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>3.0.3</version>
+        </dependency>
     </dependencies>
     <build>
         <sourceDirectory>src</sourceDirectory>

@@ -13,13 +13,16 @@ public class LinhaRelatorio {
     private final String item;
     private final LocalDate dataInicio;
     private final LocalDate dataFim;
+    private final String status;
     private final float valor;
 
-    public LinhaRelatorio(String cliente, String item, LocalDate dataInicio, LocalDate dataFim, float valor) {
+    public LinhaRelatorio(String cliente, String item, LocalDate dataInicio, LocalDate dataFim,
+                           String status, float valor) {
         this.cliente = cliente;
         this.item = item;
         this.dataInicio = dataInicio;
         this.dataFim = dataFim;
+        this.status = status;
         this.valor = valor;
     }
 
@@ -39,12 +42,11 @@ public class LinhaRelatorio {
         return dataFim != null ? dataFim.format(FORMATO_DATA) : "-";
     }
 
+    // Antes este método calculava o status com um prazo fixo de 7 dias.
+    // Agora a entidade Aluguel já guarda o status real ("Ativo"/"Finalizado"),
+    // então a LinhaRelatorio só repassa o valor recebido no construtor.
     public String getStatus() {
-        if (dataFim == null) {
-            // ainda não foi devolvido; verifica se já passou do prazo
-            return LocalDate.now().isAfter(dataInicio.plusDays(7)) ? "Atrasado" : "Regular";
-        }
-        return "Devolvido";
+        return status;
     }
 
     public float getValor() {
