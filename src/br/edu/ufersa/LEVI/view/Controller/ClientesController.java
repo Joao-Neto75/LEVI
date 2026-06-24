@@ -7,9 +7,14 @@ import br.edu.ufersa.LEVI.model.service.LocadoraFacade;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -23,7 +28,7 @@ public class ClientesController {
     @FXML private TableView<Cliente> tabelaClientes;
     @FXML private TableColumn<Cliente, String> colNome, colCpf, colEndereco, colStatus, colItens, colAcoes;
 
-    @FXML private StackPane painelFormulario;  // agora é StackPane no FXML
+    @FXML private StackPane painelFormulario;
     @FXML private Label labelTituloForm;
     @FXML private TextField fieldNome, fieldCpf, fieldEndereco;
     @FXML private Label labelErroForm;
@@ -46,7 +51,9 @@ public class ClientesController {
             Cliente cliente = c.getValue();
             List<Aluguel> alugueis = facade.buscarAlugueisPorCliente(cliente);
             boolean atrasado = alugueis.stream().anyMatch(a ->
-                    a.getDataDevolucao() != null && a.getDataDevolucao().isBefore(LocalDate.now())
+                    a.getDataDevolucao() != null
+                    && a.getDataDevolucao().isBefore(LocalDate.now())
+                    && !"Finalizado".equals(a.getStatus())
             );
             return new SimpleStringProperty(atrasado ? "Atrasado" : "Regular");
         });
@@ -65,24 +72,33 @@ public class ClientesController {
 
         colItens.setCellValueFactory(c -> {
             List<Aluguel> alugueis = facade.buscarAlugueisPorCliente(c.getValue());
-            int total = alugueis.stream().mapToInt(a -> a.getProdutos().size()).sum();
-            return new SimpleStringProperty(total == 0 ? "Nenhum" : String.valueOf(total));
+            int total = alugueis.stream()
+                    .filter(a -> !"Finalizado".equals(a.getStatus()))
+                    .mapToInt(a -> a.getProdutos().size())
+                    .sum();
+            return new SimpleStringProperty(total == 0 ? "0" : String.valueOf(total));
         });
 
         colAcoes.setCellFactory(col -> new TableCell<>() {
-            private final Button btnEditar   = new Button("✏");
+            private final Button btnEditar    = new Button("✏");
             private final Button btnHistorico = new Button("📋");
             private final HBox box = new HBox(6, btnHistorico, btnEditar);
             {
-                btnEditar.setStyle("-fx-background-color: transparent; -fx-font-size: 14px; -fx-cursor: hand;");
-                btnHistorico.setStyle("-fx-background-color: transparent; -fx-font-size: 14px; -fx-cursor: hand;");
-                btnEditar.setOnAction(e -> abrirFormularioEdicao(getTableView().getItems().get(getIndex())));
+                btnEditar.setStyle("-fx-background-color: transparent; -fx-font-size: 15px; -fx-cursor: hand;");
+                btnHistorico.setStyle("-fx-background-color: transparent; -fx-font-size: 15px; -fx-cursor: hand;");
+                btnHistorico.setTooltip(new Tooltip("Ver histórico"));
+                btnEditar.setTooltip(new Tooltip("Editar cliente"));
+
+                btnEditar.setOnAction(e -> {
+                    Cliente c = getTableView().getItems().get(getIndex());
+                    abrirFormularioEdicao(c);
+                });
                 btnHistorico.setOnAction(e -> {
                     Cliente c = getTableView().getItems().get(getIndex());
-                    int qtd = facade.buscarAlugueisPorCliente(c).size();
-                    labelErro.setText("Histórico de " + c.getNome() + ": " + qtd + " aluguel(is)");
+                    abrirHistorico(c);
                 });
             }
+
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -90,7 +106,6 @@ public class ClientesController {
             }
         });
 
-        // Colorir linha de atrasados
         tabelaClientes.setRowFactory(tv -> new TableRow<>() {
             @Override
             protected void updateItem(Cliente item, boolean empty) {
@@ -98,11 +113,36 @@ public class ClientesController {
                 if (item == null || empty) { setStyle(""); return; }
                 List<Aluguel> alugueis = facade.buscarAlugueisPorCliente(item);
                 boolean atrasado = alugueis.stream().anyMatch(a ->
-                        a.getDataDevolucao() != null && a.getDataDevolucao().isBefore(LocalDate.now())
+                        a.getDataDevolucao() != null
+                        && a.getDataDevolucao().isBefore(LocalDate.now())
+                        && !"Finalizado".equals(a.getStatus())
                 );
                 setStyle(atrasado ? "-fx-background-color: #fff0f0;" : "");
             }
         });
+    }
+
+    private void abrirHistorico(Cliente cliente) {
+        try {
+            FXMLLoader loader = new FXMLLoader(
+                getClass().getResource("/br/edu/ufersa/LEVI/view/fxml/TelaHistoricoCliente.fxml")
+            );
+            Parent root = loader.load();
+
+            HistoricoClienteController controller = loader.getController();
+            controller.carregarCliente(cliente);
+
+            Stage popup = new Stage();
+            popup.setTitle("Histórico — " + cliente.getNome());
+            popup.setScene(new Scene(root, 700, 480));
+            popup.initModality(Modality.APPLICATION_MODAL);
+            popup.initOwner(tabelaClientes.getScene().getWindow());
+            popup.setResizable(true);
+            popup.show();
+
+        } catch (IOException e) {
+            labelErro.setText("Erro ao abrir histórico: " + e.getMessage());
+        }
     }
 
     private void carregarClientes(List<Cliente> clientes) {
@@ -178,7 +218,7 @@ public class ClientesController {
     @FXML public void abrirClientes()  { /* já estamos aqui */ }
     @FXML public void abrirAlugueis()  { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaAlugueis.fxml", "Duduteca - Aluguéis"); }
     @FXML public void abrirDashboard() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaDashboard.fxml","Duduteca - Dashboard"); }
-    @FXML public void abrirRelatorio() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaRelatorio.fxml", "Duduteca - Relatório"); }
+    @FXML public void abrirRelatorio() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaRelatorio.fxml","Duduteca - Relatório"); }
     @FXML public void handleSair()     { SessaoUsuario.encerrarSessao(); navegar("/br/edu/ufersa/LEVI/view/fxml/TelaLogin.fxml", "Duduteca - Login"); }
 
     private void navegar(String fxml, String titulo) {
