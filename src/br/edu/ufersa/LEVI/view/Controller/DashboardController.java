@@ -1,8 +1,12 @@
 package br.edu.ufersa.LEVI.view.Controller;
 
 import br.edu.ufersa.LEVI.App;
+import br.edu.ufersa.LEVI.model.entity.Aluguel;
+import br.edu.ufersa.LEVI.model.entity.Disco;
 import br.edu.ufersa.LEVI.model.entity.Funcionarios;
+import br.edu.ufersa.LEVI.model.entity.Livro;
 import br.edu.ufersa.LEVI.model.service.LocadoraFacade;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -11,22 +15,22 @@ import javafx.scene.control.TextField;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DashboardController {
 
-    // Sidebar
     @FXML private Button botaoLivros;
     @FXML private Button botaoDiscos;
     @FXML private Button botaoClientes;
     @FXML private Button botaoAlugueis;
     @FXML private Button botaoSair;
 
-    // Topo
     @FXML private TextField campoBusca;
     @FXML private Label labelFuncionarioLogado;
     @FXML private Button botaoRelatorio;
 
-    // Cards
     @FXML private ListView<String> listaMaisBuscados;
     @FXML private ListView<String> listaAlugueisExpirando;
     @FXML private ListView<String> listaRenovacoes;
@@ -35,18 +39,16 @@ public class DashboardController {
     @FXML private Label labelAlugueisAtivos;
     @FXML private Label labelEstoque;
 
-    // Antes: três Services instanciados separadamente
-    // (AluguelService, LivroService, DiscoService).
-    // Agora: uma única Facade cobre os três.
     private final LocadoraFacade facade = new LocadoraFacade();
+    private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yy");
 
     @FXML
     public void initialize() {
         exibirFuncionarioLogado();
         carregarVisaoGeral();
-        // listaMaisBuscados, listaAlugueisExpirando e listaRenovacoes dependem
-        // de regras que o grupo ainda vai definir (ex: o que conta como "mais buscado"),
-        // por isso ficam vazias por enquanto.
+        carregarMaisBuscados();
+        carregarAlugueisExpirando();
+        carregarRenovacoes();
     }
 
     private void exibirFuncionarioLogado() {
@@ -64,14 +66,81 @@ public class DashboardController {
 
         int totalLivros = facade.listarLivros().size();
         int totalDiscos = facade.listarDiscos().size();
-        int totalEstoque = totalLivros + totalDiscos;
         labelEstoque.setText(String.format("Total em Estoque: %d (%d livros, %d discos)",
-                totalEstoque, totalLivros, totalDiscos));
+                totalLivros + totalDiscos, totalLivros, totalDiscos));
 
-        int alugueisAtivos = facade.listarAlugueis().size();
+        long alugueisAtivos = facade.listarAlugueis().stream()
+                .filter(a -> a.getDataDevolucao() == null)
+                .count();
         labelAlugueisAtivos.setText("Aluguéis Ativos: " + alugueisAtivos);
 
         labelVisaoGeralTitulo.setText("Visão Geral (" + mesEmPortugues(hoje.getMonthValue()) + "/" + hoje.getYear() + ")");
+    }
+
+    private void carregarMaisBuscados() {
+        List<String> itens = new ArrayList<>();
+
+        List<Livro> livros = facade.listarLivros();
+        livros.stream()
+                .sorted((a, b) -> Integer.compare(b.getExemplares(), a.getExemplares()))
+                .limit(3)
+                .forEach(l -> itens.add("📖 " + l.getTitulo() + " — " + l.getAutor()));
+
+        List<Disco> discos = facade.listarDiscos();
+        discos.stream()
+                .sorted((a, b) -> Integer.compare(b.getExemplares(), a.getExemplares()))
+                .limit(2)
+                .forEach(d -> itens.add("🎵 " + d.getTitulo() + " — " + d.getBanda()));
+
+        if (itens.isEmpty()) itens.add("Nenhum item cadastrado ainda.");
+        listaMaisBuscados.setItems(FXCollections.observableArrayList(itens));
+    }
+
+    private void carregarAlugueisExpirando() {
+        List<String> itens = new ArrayList<>();
+        LocalDate hoje = LocalDate.now();
+        LocalDate limite = hoje.plusDays(7);
+
+        List<Aluguel> alugueis = facade.listarAlugueis();
+        for (Aluguel a : alugueis) {
+            if (a.getDataDevolucao() == null) continue;
+            LocalDate dev = a.getDataDevolucao();
+            if (!dev.isBefore(hoje) && !dev.isAfter(limite)) {
+                String nomeCliente = a.getCliente() != null ? a.getCliente().getNome() : "—";
+                itens.add("⚠ " + nomeCliente + " — devolução: " + dev.format(FMT));
+            }
+        }
+
+        // Também mostra em aberto há mais de 7 dias
+        for (Aluguel a : alugueis) {
+            if (a.getDataDevolucao() != null) continue;
+            LocalDate emp = a.getDataEmprestimo();
+            if (emp != null && emp.plusDays(7).isBefore(hoje)) {
+                String nomeCliente = a.getCliente() != null ? a.getCliente().getNome() : "—";
+                itens.add("🔴 " + nomeCliente + " — desde: " + emp.format(FMT));
+            }
+        }
+
+        if (itens.isEmpty()) itens.add("✅ Nenhum aluguel expirando nos próximos 7 dias.");
+        listaAlugueisExpirando.setItems(FXCollections.observableArrayList(itens));
+    }
+
+    private void carregarRenovacoes() {
+        List<String> itens = new ArrayList<>();
+        LocalDate hoje = LocalDate.now();
+
+        List<Aluguel> alugueis = facade.listarAlugueis();
+        for (Aluguel a : alugueis) {
+            if (a.getDataDevolucao() == null) continue;
+            if (a.getDataDevolucao().isBefore(hoje)) {
+                String nomeCliente = a.getCliente() != null ? a.getCliente().getNome() : "—";
+                long dias = java.time.temporal.ChronoUnit.DAYS.between(a.getDataDevolucao(), hoje);
+                itens.add("❗ " + nomeCliente + " — " + dias + " dia(s) em atraso");
+            }
+        }
+
+        if (itens.isEmpty()) itens.add("✅ Nenhum aluguel em atraso.");
+        listaRenovacoes.setItems(FXCollections.observableArrayList(itens));
     }
 
     private String mesEmPortugues(int mes) {
@@ -80,51 +149,16 @@ public class DashboardController {
         return meses[mes - 1];
     }
 
-    @FXML
-    public void abrirLivros() {
-        trocarTelaComTratamento("/br/edu/ufersa/LEVI/view/fxml/TelaLivros.fxml", "Duduteca - Livros");
-    }
+    @FXML public void abrirLivros() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaLivros.fxml", "Duduteca - Livros"); }
+    @FXML public void abrirDiscos() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaDiscos.fxml", "Duduteca - Discos"); }
+    @FXML public void abrirClientes() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaClientes.fxml", "Duduteca - Clientes"); }
+    @FXML public void abrirAlugueis() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaAlugueis.fxml", "Duduteca - Aluguéis"); }
+    @FXML public void abrirRelatorio() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaRelatorio.fxml", "Duduteca - Relatório"); }
+    @FXML public void abrirDashboard() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaDashboard.fxml", "Duduteca - Dashboard"); }
+    @FXML public void handleSair() { SessaoUsuario.encerrarSessao(); navegar("/br/edu/ufersa/LEVI/view/fxml/TelaLogin.fxml", "Duduteca - Login"); }
 
-    @FXML
-    public void abrirDiscos() {
-        trocarTelaComTratamento("/br/edu/ufersa/LEVI/view/fxml/TelaDiscos.fxml", "Duduteca - Discos");
+    private void navegar(String fxml, String titulo) {
+        try { App.trocarTela(fxml, titulo); }
+        catch (IOException e) { labelFuncionarioLogado.setText("Erro: " + e.getMessage()); }
     }
-
-    @FXML
-    public void abrirClientes() {
-        trocarTelaComTratamento("/br/edu/ufersa/LEVI/view/fxml/TelaClientes.fxml", "Duduteca - Clientes");
-    }
-
-    @FXML
-    public void abrirAlugueis() {
-        trocarTelaComTratamento("/br/edu/ufersa/LEVI/view/fxml/TelaAlugueis.fxml", "Duduteca - Aluguéis");
-    }
-
-    @FXML
-    public void abrirRelatorio() {
-        trocarTelaComTratamento("/br/edu/ufersa/LEVI/view/fxml/TelaRelatorio.fxml", "Duduteca - Relatório");
-    }
-
-    @FXML
-    public void handleSair() {
-        SessaoUsuario.encerrarSessao();
-        trocarTelaComTratamento("/br/edu/ufersa/LEVI/view/fxml/TelaLogin.fxml", "Duduteca - Login");
-    }
-
-    @FXML
-    public void abrirDashboard() {
-        trocarTelaComTratamento("/br/edu/ufersa/LEVI/view/fxml/TelaDashboard.fxml", "Duduteca - Dashboard");
-    }
-
-    private void trocarTelaComTratamento(String caminhoFxml, String titulo) {
-        try {
-            App.trocarTela(caminhoFxml, titulo);
-        } catch (IOException e) {
-            // Essas telas ainda não existem; quando forem criadas, a navegação já funciona.
-            labelFuncionarioLogado.setText("Tela ainda não implementada: " + caminhoFxml);
-            // TEMPORÁRIO: imprime o stack trace completo no console para diagnosticar
-            e.printStackTrace();
-        }
-    }
-
 }
