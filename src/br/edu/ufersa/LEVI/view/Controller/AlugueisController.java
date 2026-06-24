@@ -127,9 +127,13 @@ public class AlugueisController {
                 super.updateItem(item, empty);
                 if (item == null || empty) { setText(null); setStyle(""); return; }
                 setText(item);
-                setStyle(item.startsWith("Atrasado")
-                        ? "-fx-text-fill: #cc0000; -fx-font-weight: bold;"
-                        : "-fx-text-fill: #228B22; -fx-font-weight: bold;");
+                if (item.startsWith("Atrasado")) {
+                    setStyle("-fx-text-fill: #cc0000; -fx-font-weight: bold;");
+                } else if (item.equals("Finalizado")) {
+                    setStyle("-fx-text-fill: #808080; -fx-font-weight: normal;");
+                } else {
+                    setStyle("-fx-text-fill: #228B22; -fx-font-weight: bold;");
+                }
             }
         });
     }
@@ -144,12 +148,10 @@ public class AlugueisController {
             String fim = a.getDataDevolucao() != null ? a.getDataDevolucao().format(FMT) : "—";
             String datas = inicio + " - " + fim;
 
-            String status;
-            if (a.getDataDevolucao() == null) {
-                status = "Regular";
-            } else {
+            String status = a.getStatus();
+            if (status.equals("Ativo") && a.getDataDevolucao() != null) {
                 long diasAtraso = java.time.temporal.ChronoUnit.DAYS.between(a.getDataDevolucao(), LocalDate.now());
-                status = diasAtraso > 0 ? "Atrasado (" + diasAtraso + " dias)" : "Regular";
+                if (diasAtraso > 0) status = "Atrasado (" + diasAtraso + " dias)";
             }
 
             for (Produto p : a.getProdutos()) {
@@ -205,10 +207,19 @@ public class AlugueisController {
             labelErro.setText("Selecione um aluguel na tabela para registrar devolução.");
             return;
         }
+        if (selecionada.status.equals("Finalizado")) {
+            labelErro.setText("Este aluguel já foi finalizado.");
+            return;
+        }
+
         // Busca o aluguel correspondente e finaliza
         List<Aluguel> alugueis = facade.listarAlugueis();
         for (Aluguel a : alugueis) {
-            if (a.getCliente() != null && a.getCliente().getNome().equals(selecionada.nomeCliente)) {
+            // Verifica se o aluguel bate com o cliente e título selecionado e ainda está Ativo
+            boolean mesmoCliente = a.getCliente() != null && a.getCliente().getNome().equals(selecionada.nomeCliente);
+            boolean mesmoProduto = a.getProdutos().stream().anyMatch(p -> p.getDescricao().contains(selecionada.titulo));
+            
+            if (mesmoCliente && mesmoProduto && !a.getStatus().equals("Finalizado")) {
                 try {
                     facade.finalizarAluguel(a, LocalDate.now());
                     labelErro.setText("");
@@ -219,7 +230,7 @@ public class AlugueisController {
                 }
             }
         }
-        labelErro.setText("Aluguel não encontrado.");
+        labelErro.setText("Aluguel ativo não encontrado.");
     }
 
     // Classe auxiliar para linhas da tabela

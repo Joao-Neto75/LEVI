@@ -11,6 +11,7 @@ public class Aluguel {
     private LocalDate dataEmprestimo;
     private LocalDate dataDevolucao;
     private float valorTotal;
+    private String status = "Ativo";
 
     // Construtor vazio
     public Aluguel() {
@@ -53,6 +54,7 @@ public class Aluguel {
 
     public void finalizarAluguel(LocalDate dataDevolucao) {
         setDataDevolucao(dataDevolucao);
+        this.status = "Finalizado";
         // devolve os exemplares
         for (Produto p : produtos) {
             p.adicionarExemplar(1);
@@ -71,6 +73,7 @@ public class Aluguel {
     public LocalDate getDataEmprestimo() { return dataEmprestimo; }
     public LocalDate getDataDevolucao() { return dataDevolucao; }
     public float getValorTotal() { return valorTotal; }
+    public String getStatus() { return status; }
 
     // Setters com validação
     public void setId(int id) { this.id = id; }
@@ -99,4 +102,5 @@ public class Aluguel {
     public void setValorTotal(float valorTotal) {
         this.valorTotal = valorTotal;
     }
+    public void setStatus(String status) { this.status = status; }
 }

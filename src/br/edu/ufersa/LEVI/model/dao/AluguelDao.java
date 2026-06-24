@@ -15,13 +15,14 @@ public class AluguelDao extends AbstractDao<Aluguel> {
 
     @Override
     protected Aluguel executarInsercao(Connection con, Aluguel entity) throws SQLException {
-        String sql = "INSERT INTO alugueis (cliente_id, data_emprestimo, data_devolucao, valor_total) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO alugueis (cliente_id, data_emprestimo, data_devolucao, valor_total, status) VALUES (?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = con.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, entity.getCliente().getId());
             stmt.setDate(2, Date.valueOf(entity.getDataEmprestimo()));
             stmt.setDate(3, entity.getDataDevolucao() != null ? Date.valueOf(entity.getDataDevolucao()) : null);
             stmt.setFloat(4, entity.getValorTotal());
+            stmt.setString(5, entity.getStatus());
             stmt.execute();
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
@@ -48,12 +49,13 @@ public class AluguelDao extends AbstractDao<Aluguel> {
 
     @Override
     protected Aluguel executarAlteracao(Connection con, Aluguel entity) throws SQLException {
-        String sql = "UPDATE alugueis SET data_devolucao=?, valor_total=? WHERE id=?";
+        String sql = "UPDATE alugueis SET data_devolucao=?, valor_total=?, status=? WHERE id=?";
 
         try (PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setDate(1, entity.getDataDevolucao() != null ? Date.valueOf(entity.getDataDevolucao()) : null);
             stmt.setFloat(2, entity.getValorTotal());
-            stmt.setInt(3, entity.getId());
+            stmt.setString(3, entity.getStatus());
+            stmt.setInt(4, entity.getId());
             stmt.execute();
         }
         return entity;
@@ -76,7 +78,7 @@ public class AluguelDao extends AbstractDao<Aluguel> {
     protected List<Aluguel> executarBusca(Connection con, String parametro) throws SQLException {
         // Busca por CPF ou nome do cliente, já hidratando o objeto Cliente e os Produtos
         String sql =
-            "SELECT a.id, a.data_emprestimo, a.data_devolucao, a.valor_total, " +
+            "SELECT a.id, a.data_emprestimo, a.data_devolucao, a.valor_total, a.status, " +
             "       c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.endereco AS c_end " +
             "FROM alugueis a " +
             "JOIN cliente c ON a.cliente_id = c.id " +
@@ -99,7 +101,7 @@ public class AluguelDao extends AbstractDao<Aluguel> {
     protected List<Aluguel> executarListagem(Connection con) throws SQLException {
         // JOIN com cliente para já trazer os dados completos
         String sql =
-            "SELECT a.id, a.data_emprestimo, a.data_devolucao, a.valor_total, " +
+            "SELECT a.id, a.data_emprestimo, a.data_devolucao, a.valor_total, a.status, " +
             "       c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.endereco AS c_end " +
             "FROM alugueis a " +
             "JOIN cliente c ON a.cliente_id = c.id";
@@ -116,7 +118,7 @@ public class AluguelDao extends AbstractDao<Aluguel> {
 
     public List<Aluguel> buscarPorMes(int mes, int ano) {
         String sql =
-            "SELECT a.id, a.data_emprestimo, a.data_devolucao, a.valor_total, " +
+            "SELECT a.id, a.data_emprestimo, a.data_devolucao, a.valor_total, a.status, " +
             "       c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.endereco AS c_end " +
             "FROM alugueis a " +
             "JOIN cliente c ON a.cliente_id = c.id " +
@@ -161,6 +163,7 @@ public class AluguelDao extends AbstractDao<Aluguel> {
         }
 
         a.setValorTotal(rs.getFloat("valor_total"));
+        a.setStatus(rs.getString("status"));
 
         // Hidratar Produtos (livros e discos) via tabela aluguel_produtos
         carregarProdutosDoAluguel(con, a);
