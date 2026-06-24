@@ -64,7 +64,7 @@
     </left>
 
     <center>
-        <VBox spacing="20.0">
+        <VBox spacing="20.0" maxHeight="Infinity" maxWidth="Infinity">
             <padding><Insets top="30" right="35" bottom="30" left="35"/></padding>
             <children>
 
@@ -92,12 +92,15 @@
                             <ComboBox fx:id="comboFiltro" promptText="Todo" onAction="#handleMudarFiltro"/>
                         </children></HBox>
                         <HBox alignment="CENTER_LEFT" spacing="15.0"><children>
-                            <TextField fx:id="campoBuscaCliente" disable="true" prefWidth="350.0"
-                                       promptText="Buscar por cliente (nome ou CPF)" styleClass="search-field"/>
+                            <ComboBox fx:id="comboCliente" disable="true" prefWidth="350.0"
+                                      promptText="Selecione um cliente..."/>
                             <Button fx:id="botaoGerar" text="GERAR" styleClass="btn-primary"
                                     onAction="#handleGerarRelatorio"/>
+                            <Button fx:id="botaoGerarPdf" text="GERAR PDF" styleClass="btn-primary"
+                                    onAction="#handleGerarPdf"/>
                         </children></HBox>
                         <Label fx:id="labelErro" styleClass="error-label"/>
+                        <Label fx:id="labelSucesso" style="-fx-text-fill: #1d7a3c; -fx-font-size: 12px;" wrapText="true"/>
                     </children>
                 </VBox>
 
@@ -110,7 +113,7 @@
                     </children>
                 </VBox>
 
-                <TableView fx:id="tabelaResultado" VBox.vgrow="ALWAYS" styleClass="table-view">
+                <TableView fx:id="tabelaResultado" VBox.vgrow="ALWAYS" maxHeight="Infinity" styleClass="table-view">
                     <columns>
                         <TableColumn fx:id="colunaCliente"    text="Cliente"     prefWidth="130"/>
                         <TableColumn fx:id="colunaItem"       text="Livro/Disco" prefWidth="220"/>
