@@ -17,7 +17,7 @@ public class ConnectionFactory {
     private static final String USER = "root";
 
     // colocar a senha do banco de dados
-    private static final String PASSWORD = "SUA_SENHA_AQUI";
+    private static final String PASSWORD = "SUA SENHA AQUI";
 
     // única instância da classe, criada apenas quando for pedida pela primeira vez
     private static ConnectionFactory instancia;

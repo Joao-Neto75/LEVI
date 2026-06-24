@@ -18,8 +18,6 @@ public class LoginController {
     @FXML private Button botaoEntrar;
     @FXML private Label labelErro;
 
-    // Antes: "private final FuncionariosService funcionariosService = new FuncionariosService();"
-    // Agora: usa a Facade, que por trás delega para o FuncionariosService.
     private final LocadoraFacade facade = new LocadoraFacade();
 
     @FXML
@@ -32,16 +30,18 @@ public class LoginController {
         try {
             Funcionarios logado = facade.autenticar(email, senha);
 
-            // guarda o funcionário logado para uso nas próximas telas
             SessaoUsuario.setFuncionarioLogado(logado);
 
             App.trocarTela("/br/edu/ufersa/LEVI/view/fxml/TelaDashboard.fxml", "Duduteca - Dashboard");
 
         } catch (RuntimeException e) {
-            // mensagens como "E-mail ou senha inválidos!" vindas do FuncionariosService
             labelErro.setText(e.getMessage());
+            // TEMPORÁRIO: imprime o stack trace completo no console para diagnosticar
+            e.printStackTrace();
         } catch (IOException e) {
             labelErro.setText("Erro ao carregar a próxima tela. Avise o grupo!");
+            // TEMPORÁRIO: imprime o stack trace completo no console para diagnosticar
+            e.printStackTrace();
         }
     }
 }

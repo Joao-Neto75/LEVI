@@ -1,182 +1,126 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import java.lang.*?>
-<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ComboBox?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="650.0" prefWidth="1000.0" style="-fx-background-color: #F4E9DD;" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="br.edu.ufersa.LEVI.view.Controller.RelatorioController">
+<BorderPane prefHeight="650.0" prefWidth="1000.0"
+    stylesheets="@../css/duduteca.css"
+    xmlns="http://javafx.com/javafx/17"
+    xmlns:fx="http://javafx.com/fxml/1"
+    fx:controller="br.edu.ufersa.LEVI.view.Controller.RelatorioController">
 
-    <!-- ===================== SIDEBAR (igual às outras telas) ===================== -->
     <left>
-        <VBox prefWidth="230.0" spacing="30.0" style="-fx-background-color: #D4A537;">
-            <padding>
-                <Insets bottom="30" left="30" right="20" top="30" />
-            </padding>
-           <children>
-   
-               <Label style="-fx-font-size: 22px; -fx-font-weight: bold;" text="DUDUTECA">
-                   <VBox.margin>
-                       <Insets bottom="20" />
-                   </VBox.margin>
-               </Label>
-   
-               <Button fx:id="botaoLivros" alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity" onAction="#abrirLivros" style="-fx-background-color: transparent; -fx-font-size: 16px; -fx-font-weight: bold;" text="Livros">
-                   <graphic>
-                       <ImageView fitHeight="26.0" fitWidth="26.0" preserveRatio="true">
-                           <image>
-                               <Image url="@../icons/livro.png" />
-                           </image>
-                       </ImageView>
-                   </graphic>
-               </Button>
-   
-               <Button fx:id="botaoDiscos" alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity" onAction="#abrirDiscos" style="-fx-background-color: transparent; -fx-font-size: 16px; -fx-font-weight: bold;" text="Discos">
-                   <graphic>
-                       <ImageView fitHeight="26.0" fitWidth="26.0" preserveRatio="true">
-                           <image>
-                               <Image url="@../icons/disco.png" />
-                           </image>
-                       </ImageView>
-                   </graphic>
-               </Button>
-   
-               <Button fx:id="botaoClientes" alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity" onAction="#abrirClientes" style="-fx-background-color: transparent; -fx-font-size: 16px; -fx-font-weight: bold;" text="Clientes">
-                   <graphic>
-                       <ImageView fitHeight="26.0" fitWidth="26.0" preserveRatio="true">
-                           <image>
-                               <Image url="@../icons/cliente.png" />
-                           </image>
-                       </ImageView>
-                   </graphic>
-               </Button>
-   
-               <Button fx:id="botaoAlugueis" alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity" onAction="#abrirAlugueis" style="-fx-background-color: transparent; -fx-font-size: 16px; -fx-font-weight: bold;" text="Alugueis">
-                   <graphic>
-                       <ImageView fitHeight="26.0" fitWidth="26.0" preserveRatio="true">
-                           <image>
-                               <Image url="@../icons/aluguel.png" />
-                           </image>
-                       </ImageView>
-                   </graphic>
-               </Button>
-   
-               <Button fx:id="botaoRelatorio" alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity" onAction="#abrirRelatorio" style="-fx-background-color: transparent; -fx-font-size: 16px; -fx-font-weight: bold; -fx-underline: true;" text="Relatório">
-                   <graphic>
-                       <ImageView fitHeight="26.0" fitWidth="26.0" preserveRatio="true">
-                           <image>
-                               <Image url="@../icons/relatorio.png" />
-                           </image>
-                       </ImageView>
-                   </graphic>
-               </Button>
-   
-               <Button fx:id="botaoVoltar" alignment="CENTER_LEFT" maxWidth="Infinity" onAction="#abrirDashboard" style="-fx-background-color: transparent; -fx-font-size: 14px;" text="Voltar">
-                   <VBox.margin>
-                       <Insets top="150" />
-                   </VBox.margin>
-               </Button>
-           </children>
-
+        <VBox styleClass="sidebar" spacing="0">
+            <padding><Insets top="30" right="20" bottom="30" left="24"/></padding>
+            <children>
+                <Button onAction="#abrirDashboard" styleClass="sidebar-btn" style="-fx-padding: 0; -fx-background-color: transparent;">
+                    <graphic>
+                        <Label text="DUDUTECA" styleClass="sidebar-title">
+                            <VBox.margin><Insets bottom="36"/></VBox.margin>
+                        </Label>
+                    </graphic>
+                    <VBox.margin><Insets bottom="36"/></VBox.margin>
+                </Button>
+                <Button fx:id="botaoLivros" text="Livros" styleClass="sidebar-btn"
+                        onAction="#abrirLivros" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
+                        <image><Image url="@../icons/livro.png"/></image>
+                    </ImageView></graphic>
+                    <VBox.margin><Insets bottom="24"/></VBox.margin>
+                </Button>
+                <Button fx:id="botaoDiscos" text="Discos" styleClass="sidebar-btn"
+                        onAction="#abrirDiscos" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
+                        <image><Image url="@../icons/disco.png"/></image>
+                    </ImageView></graphic>
+                    <VBox.margin><Insets bottom="24"/></VBox.margin>
+                </Button>
+                <Button fx:id="botaoClientes" text="Clientes" styleClass="sidebar-btn"
+                        onAction="#abrirClientes" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
+                        <image><Image url="@../icons/cliente.png"/></image>
+                    </ImageView></graphic>
+                    <VBox.margin><Insets bottom="24"/></VBox.margin>
+                </Button>
+                <Button fx:id="botaoAlugueis" text="Alugueis" styleClass="sidebar-btn"
+                        onAction="#abrirAlugueis" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
+                        <image><Image url="@../icons/aluguel.png"/></image>
+                    </ImageView></graphic>
+                    <VBox.margin><Insets bottom="24"/></VBox.margin>
+                </Button>
+                <Button fx:id="botaoRelatorio" text="Relatório" styleClass="sidebar-btn, sidebar-btn-active"
+                        onAction="#abrirRelatorio" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
+                        <image><Image url="@../icons/relatorio.png"/></image>
+                    </ImageView></graphic>
+                </Button>
+                <Region VBox.vgrow="ALWAYS"/>
+                <Button fx:id="botaoSair" text="Sair" styleClass="sidebar-sair"
+                        onAction="#handleSair" maxWidth="Infinity"/>
+            </children>
         </VBox>
     </left>
 
-    <!-- ===================== CONTEÚDO ===================== -->
     <center>
         <VBox spacing="20.0">
-            <padding>
-                <Insets bottom="30" left="35" right="35" top="30" />
-            </padding>
-           <children>
-   
-               <!-- Card: Faturamento do mês -->
-               <HBox alignment="CENTER_LEFT" spacing="20.0" style="-fx-background-color: #1E1E1E; -fx-background-radius: 10;">
-                   <padding>
-                       <Insets bottom="15" left="20" right="20" top="15" />
-                   </padding>
-      <children>
-      
-                      <VBox>
-         <children>
-                             <Label style="-fx-font-size: 13px;" text="Faturamento Total" textFill="WHITE" />
-                             <Label fx:id="labelFaturamento" style="-fx-font-size: 22px; -fx-font-weight: bold;" text="R\$ 0,00" textFill="WHITE" />
-         </children>
-                      </VBox>
-      
-                      <ComboBox fx:id="comboMesAno" onAction="#handleMudarMesAno" promptText="Mês/Ano" />
-      
-                      <VBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
-         <children>
-                             <Label fx:id="labelLivrosAlugados" style="-fx-font-size: 12px;" text="Livros: 0" textFill="WHITE" />
-                             <Label fx:id="labelDiscosAlugados" style="-fx-font-size: 12px;" text="Discos: 0" textFill="WHITE" />
-         </children>
-                      </VBox>
-      </children>
-               </HBox>
-   
-               <!-- Card: Gerar relatório -->
-               <VBox spacing="12.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-border-color: #1E1E1E; -fx-border-radius: 12;">
-                   <padding>
-                       <Insets bottom="20" left="20" right="20" top="20" />
-                   </padding>
-      <children>
-      
-                      <HBox alignment="CENTER_LEFT" spacing="15.0">
-         <children>
-                             <Label style="-fx-font-size: 16px; -fx-font-weight: bold;" text="Gerar Relatório" />
-                             <ComboBox fx:id="comboFiltro" onAction="#handleMudarFiltro" promptText="Todo" />
-         </children>
-                      </HBox>
-      
-                      <HBox alignment="CENTER_LEFT" spacing="15.0">
-         <children>
-                             <TextField fx:id="campoBuscaCliente" disable="true" prefWidth="350.0" promptText="Buscar por cliente (nome ou CPF)" />
-                             <Button fx:id="botaoGerar" onAction="#handleGerarRelatorio" style="-fx-background-color: #D4A537; -fx-font-weight: bold;" text="GERAR" />
-         </children>
-                      </HBox>
-      
-                      <Label fx:id="labelErro" style="-fx-font-size: 12px;" textFill="RED" wrapText="true" />
-      </children>
-               </VBox>
-   
-               <!-- Cabeçalho do cliente, só aparece quando o filtro é um cliente específico -->
-               <VBox fx:id="boxCabecalhoCliente" managed="false" style="-fx-background-color: #1E1E1E; -fx-background-radius: 10;" visible="false">
-                   <padding>
-                       <Insets bottom="12" left="20" right="20" top="12" />
-                   </padding>
-      <children>
-                      <Label fx:id="labelTituloRelatorioCliente" style="-fx-font-size: 16px; -fx-font-weight: bold;" textFill="WHITE" />
-                      <Label fx:id="labelDadosCliente" style="-fx-font-size: 12px;" textFill="WHITE" />
-      </children>
-               </VBox>
-   
-               <!-- Tabela de resultado -->
-               <TableView fx:id="tabelaResultado" VBox.vgrow="ALWAYS">
-                   <columns>
-                       <TableColumn fx:id="colunaCliente" prefWidth="130.0" text="Cliente" />
-                       <TableColumn fx:id="colunaItem" prefWidth="220.0" text="Livro/Disco" />
-                       <TableColumn fx:id="colunaDataInicio" prefWidth="100.0" text="Início" />
-                       <TableColumn fx:id="colunaDataFim" prefWidth="100.0" text="Devolução" />
-                       <TableColumn fx:id="colunaStatus" prefWidth="100.0" text="Status" />
-                       <TableColumn fx:id="colunaValor" prefWidth="100.0" text="Valor" />
-                   </columns>
-               </TableView>
-           </children>
+            <padding><Insets top="30" right="35" bottom="30" left="35"/></padding>
+            <children>
 
+                <HBox alignment="CENTER_LEFT" spacing="20.0" styleClass="card-dark">
+                    <padding><Insets top="15" right="20" bottom="15" left="20"/></padding>
+                    <children>
+                        <VBox><children>
+                            <Label text="Faturamento Total" style="-fx-font-size:13px;" textFill="WHITE"/>
+                            <Label fx:id="labelFaturamento" text="R$ 0,00"
+                                   style="-fx-font-size:22px; -fx-font-weight:bold;" textFill="WHITE"/>
+                        </children></VBox>
+                        <ComboBox fx:id="comboMesAno" promptText="Mês/Ano" onAction="#handleMudarMesAno"/>
+                        <VBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS"><children>
+                            <Label fx:id="labelLivrosAlugados" text="Livros: 0" style="-fx-font-size:12px;" textFill="WHITE"/>
+                            <Label fx:id="labelDiscosAlugados" text="Discos: 0" style="-fx-font-size:12px;" textFill="WHITE"/>
+                        </children></VBox>
+                    </children>
+                </HBox>
+
+                <VBox spacing="12.0" styleClass="card-white">
+                    <padding><Insets top="20" right="20" bottom="20" left="20"/></padding>
+                    <children>
+                        <HBox alignment="CENTER_LEFT" spacing="15.0"><children>
+                            <Label text="Gerar Relatório" style="-fx-font-size:16px; -fx-font-weight:bold;"/>
+                            <ComboBox fx:id="comboFiltro" promptText="Todo" onAction="#handleMudarFiltro"/>
+                        </children></HBox>
+                        <HBox alignment="CENTER_LEFT" spacing="15.0"><children>
+                            <TextField fx:id="campoBuscaCliente" disable="true" prefWidth="350.0"
+                                       promptText="Buscar por cliente (nome ou CPF)" styleClass="search-field"/>
+                            <Button fx:id="botaoGerar" text="GERAR" styleClass="btn-primary"
+                                    onAction="#handleGerarRelatorio"/>
+                        </children></HBox>
+                        <Label fx:id="labelErro" styleClass="error-label"/>
+                    </children>
+                </VBox>
+
+                <VBox fx:id="boxCabecalhoCliente" managed="false" visible="false" styleClass="card-dark">
+                    <padding><Insets top="12" right="20" bottom="12" left="20"/></padding>
+                    <children>
+                        <Label fx:id="labelTituloRelatorioCliente"
+                               style="-fx-font-size:16px; -fx-font-weight:bold;" textFill="WHITE"/>
+                        <Label fx:id="labelDadosCliente" style="-fx-font-size:12px;" textFill="WHITE"/>
+                    </children>
+                </VBox>
+
+                <TableView fx:id="tabelaResultado" VBox.vgrow="ALWAYS" styleClass="table-view">
+                    <columns>
+                        <TableColumn fx:id="colunaCliente"    text="Cliente"     prefWidth="130"/>
+                        <TableColumn fx:id="colunaItem"       text="Livro/Disco" prefWidth="220"/>
+                        <TableColumn fx:id="colunaDataInicio" text="Início"      prefWidth="100"/>
+                        <TableColumn fx:id="colunaDataFim"    text="Devolução"   prefWidth="100"/>
+                        <TableColumn fx:id="colunaStatus"     text="Status"      prefWidth="100"/>
+                        <TableColumn fx:id="colunaValor"      text="Valor"       prefWidth="100"/>
+                    </columns>
+                </TableView>
+            </children>
         </VBox>
     </center>
-
 </BorderPane>

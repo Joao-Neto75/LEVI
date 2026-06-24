@@ -277,6 +277,12 @@ public class RelatorioController {
         trocarTelaComTratamento("/br/edu/ufersa/LEVI/view/fxml/TelaDashboard.fxml", "Duduteca - Dashboard");
     }
 
+    @FXML
+    public void handleSair() {
+        SessaoUsuario.encerrarSessao();
+        trocarTelaComTratamento("/br/edu/ufersa/LEVI/view/fxml/TelaLogin.fxml", "Duduteca - Login");
+    }
+
     private void trocarTelaComTratamento(String caminhoFxml, String titulo) {
         try {
             App.trocarTela(caminhoFxml, titulo);

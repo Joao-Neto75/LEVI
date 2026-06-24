@@ -3,7 +3,10 @@ package br.edu.ufersa.LEVI.model.dao;
 import br.edu.ufersa.LEVI.connection.ConnectionFactory;
 import br.edu.ufersa.LEVI.model.entity.Aluguel;
 import br.edu.ufersa.LEVI.model.entity.Cliente;
+import br.edu.ufersa.LEVI.model.entity.Disco;
+import br.edu.ufersa.LEVI.model.entity.Livro;
 import br.edu.ufersa.LEVI.model.entity.Produto;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +31,7 @@ public class AluguelDao extends AbstractDao<Aluguel> {
             }
         }
 
-        // insere os produtos do aluguel na tabela aluguel_produtos
         inserirProdutosDoAluguel(con, entity);
-
         return entity;
     }
 
@@ -60,36 +61,34 @@ public class AluguelDao extends AbstractDao<Aluguel> {
 
     @Override
     protected Aluguel executarExclusao(Connection con, Aluguel entity) throws SQLException {
-        // remove os produtos do aluguel primeiro (chave estrangeira)
         try (PreparedStatement stmt1 = con.prepareStatement("DELETE FROM aluguel_produtos WHERE aluguel_id=?")) {
             stmt1.setInt(1, entity.getId());
             stmt1.execute();
         }
-
-        // remove o aluguel
         try (PreparedStatement stmt2 = con.prepareStatement("DELETE FROM alugueis WHERE id=?")) {
             stmt2.setInt(1, entity.getId());
             stmt2.execute();
         }
-
         return entity;
     }
 
     @Override
     protected List<Aluguel> executarBusca(Connection con, String parametro) throws SQLException {
-        // busca por CPF ou nome do cliente
-        String sql = "SELECT a.* FROM alugueis a " +
-                "JOIN cliente c ON a.cliente_id = c.id " +
-                "WHERE c.cpf LIKE ? OR c.nome LIKE ?";
-        List<Aluguel> lista = new ArrayList<>();
+        // Busca por CPF ou nome do cliente, já hidratando o objeto Cliente e os Produtos
+        String sql =
+            "SELECT a.id, a.data_emprestimo, a.data_devolucao, a.valor_total, " +
+            "       c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.endereco AS c_end " +
+            "FROM alugueis a " +
+            "JOIN cliente c ON a.cliente_id = c.id " +
+            "WHERE c.cpf LIKE ? OR c.nome LIKE ?";
 
+        List<Aluguel> lista = new ArrayList<>();
         try (PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setString(1, "%" + parametro + "%");
             stmt.setString(2, "%" + parametro + "%");
-
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    lista.add(mapearAluguel(rs));
+                    lista.add(mapearAluguelCompleto(rs, con));
                 }
             }
         }
@@ -98,35 +97,39 @@ public class AluguelDao extends AbstractDao<Aluguel> {
 
     @Override
     protected List<Aluguel> executarListagem(Connection con) throws SQLException {
-        String sql = "SELECT * FROM alugueis";
-        List<Aluguel> lista = new ArrayList<>();
+        // JOIN com cliente para já trazer os dados completos
+        String sql =
+            "SELECT a.id, a.data_emprestimo, a.data_devolucao, a.valor_total, " +
+            "       c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.endereco AS c_end " +
+            "FROM alugueis a " +
+            "JOIN cliente c ON a.cliente_id = c.id";
 
+        List<Aluguel> lista = new ArrayList<>();
         try (PreparedStatement stmt = con.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-
             while (rs.next()) {
-                lista.add(mapearAluguel(rs));
+                lista.add(mapearAluguelCompleto(rs, con));
             }
         }
         return lista;
     }
 
-    // Método específico de AluguelDao, usado para o relatório por mês. Não faz
-    // parte do contrato BaseDao, então abre e fecha a conexão manualmente,
-    // como já fazia antes da migração.
     public List<Aluguel> buscarPorMes(int mes, int ano) {
-        String sql = "SELECT * FROM alugueis WHERE MONTH(data_emprestimo)=? AND YEAR(data_emprestimo)=?";
-        List<Aluguel> lista = new ArrayList<>();
+        String sql =
+            "SELECT a.id, a.data_emprestimo, a.data_devolucao, a.valor_total, " +
+            "       c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.endereco AS c_end " +
+            "FROM alugueis a " +
+            "JOIN cliente c ON a.cliente_id = c.id " +
+            "WHERE MONTH(a.data_emprestimo)=? AND YEAR(a.data_emprestimo)=?";
 
+        List<Aluguel> lista = new ArrayList<>();
         try (Connection con = ConnectionFactory.getInstance().getConnection();
              PreparedStatement stmt = con.prepareStatement(sql)) {
-
             stmt.setInt(1, mes);
             stmt.setInt(2, ano);
-
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
-                    lista.add(mapearAluguel(rs));
+                    lista.add(mapearAluguelCompleto(rs, con));
                 }
             }
         } catch (SQLException e) {
@@ -137,12 +140,17 @@ public class AluguelDao extends AbstractDao<Aluguel> {
         return lista;
     }
 
-    private Aluguel mapearAluguel(ResultSet rs) throws SQLException {
+    // Monta o Aluguel com Cliente e Produtos já hidratados
+    private Aluguel mapearAluguelCompleto(ResultSet rs, Connection con) throws SQLException {
         Aluguel a = new Aluguel();
         a.setId(rs.getInt("id"));
 
+        // Hidratar Cliente completo
         Cliente c = new Cliente();
-        c.setId(rs.getInt("cliente_id"));
+        c.setId(rs.getInt("c_id"));
+        c.setNome(rs.getString("c_nome"));
+        c.setCpf(rs.getString("c_cpf"));
+        c.setEndereco(rs.getString("c_end"));
         a.setCliente(c);
 
         a.setDataEmprestimo(rs.getDate("data_emprestimo").toLocalDate());
@@ -153,6 +161,62 @@ public class AluguelDao extends AbstractDao<Aluguel> {
         }
 
         a.setValorTotal(rs.getFloat("valor_total"));
+
+        // Hidratar Produtos (livros e discos) via tabela aluguel_produtos
+        carregarProdutosDoAluguel(con, a);
+
         return a;
+    }
+
+    // Carrega os produtos (Livro ou Disco) de um aluguel diretamente no objeto
+    private void carregarProdutosDoAluguel(Connection con, Aluguel aluguel) throws SQLException {
+        // Tenta carregar livros vinculados ao aluguel
+        String sqlLivro =
+            "SELECT l.* FROM livro l " +
+            "JOIN aluguel_produtos ap ON l.id = ap.produto_id " +
+            "WHERE ap.aluguel_id = ?";
+
+        try (PreparedStatement stmt = con.prepareStatement(sqlLivro)) {
+            stmt.setInt(1, aluguel.getId());
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Livro livro = new Livro();
+                    livro.setId(rs.getInt("id"));
+                    livro.setTitulo(rs.getString("titulo"));
+                    livro.setAutor(rs.getString("autor"));
+                    livro.setGenero(rs.getString("genero"));
+                    livro.setExemplares(rs.getInt("exemplares"));
+                    livro.setValorAluguel(rs.getFloat("valor_aluguel"));
+                    Date ano = rs.getDate("ano");
+                    if (ano != null) livro.setAno(ano.toLocalDate());
+                    // Adiciona direto na lista sem remover exemplar (já foi removido no aluguel)
+                    aluguel.getProdutos().add(livro);
+                }
+            }
+        }
+
+        // Tenta carregar discos vinculados ao aluguel
+        String sqlDisco =
+            "SELECT d.* FROM disco d " +
+            "JOIN aluguel_produtos ap ON d.id = ap.produto_id " +
+            "WHERE ap.aluguel_id = ?";
+
+        try (PreparedStatement stmt = con.prepareStatement(sqlDisco)) {
+            stmt.setInt(1, aluguel.getId());
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Disco disco = new Disco();
+                    disco.setId(rs.getInt("id"));
+                    disco.setTitulo(rs.getString("titulo"));
+                    disco.setBanda(rs.getString("banda"));
+                    disco.setEstilo(rs.getString("estilo"));
+                    disco.setExemplares(rs.getInt("exemplares"));
+                    disco.setValorAluguel(rs.getFloat("valor_aluguel"));
+                    Date ano = rs.getDate("ano");
+                    if (ano != null) disco.setAno(ano.toLocalDate());
+                    aluguel.getProdutos().add(disco);
+                }
+            }
+        }
     }
 }

@@ -122,6 +122,8 @@ public class DashboardController {
         } catch (IOException e) {
             // Essas telas ainda não existem; quando forem criadas, a navegação já funciona.
             labelFuncionarioLogado.setText("Tela ainda não implementada: " + caminhoFxml);
+            // TEMPORÁRIO: imprime o stack trace completo no console para diagnosticar
+            e.printStackTrace();
         }
     }
 
