@@ -40,15 +40,9 @@ public class HistoricoClienteController {
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yy");
     private static final float MULTA_POR_DIA = 5.0f; // R$5,00 por dia de atraso
 
-    // ─── Classe auxiliar para uma linha da tabela ───────────────────────────
     public static class LinhaHistorico {
-        private final String tipo;
-        private final String produto;
-        private final String emprestimo;
-        private final String devolucao;
-        private final String status;
-        private final String valor;
-        private final float multa;
+        final String tipo, produto, emprestimo, devolucao, status, valor;
+        final float multa;
 
         public LinhaHistorico(String tipo, String produto, String emprestimo,
                               String devolucao, String status, float valor, float multa) {
@@ -60,37 +54,59 @@ public class HistoricoClienteController {
             this.valor      = String.format("R$ %.2f", valor);
             this.multa      = multa;
         }
-
-        public float getMulta() { return multa; }
     }
 
-    // ─── Chamado pelo ClientesController antes de abrir o popup ─────────────
     public void carregarCliente(Cliente cliente) {
-        // Cabeçalho
         labelNomeCliente.setText(cliente.getNome());
         labelCpf.setText("CPF: " + cliente.getCpf());
         labelEndereco.setText("Endereço: " + cliente.getEndereco());
 
-        // Alugueis do cliente
         List<Aluguel> alugueis = facade.buscarAlugueisPorCliente(cliente);
 
-        // Verifica se há atrasos
         boolean temAtraso = alugueis.stream().anyMatch(a ->
-            a.getDataDevolucao() != null && a.getDataDevolucao().isBefore(LocalDate.now())
-            && !"Finalizado".equals(a.getStatus())
+                a.getDataDevolucao() != null
+                        && a.getDataDevolucao().isBefore(LocalDate.now())
+                        && !"Finalizado".equals(a.getStatus())
         );
         labelStatus.setText("Status: " + (temAtraso ? "Atrasado" : "Regular"));
         labelStatus.setStyle("-fx-font-size: 13px; -fx-font-weight: bold; -fx-text-fill: "
-            + (temAtraso ? "#cc0000" : "#228B22") + ";");
+                + (temAtraso ? "#cc0000" : "#228B22") + ";");
 
-        // Monta as linhas
         configurarTabela();
         var linhas = FXCollections.<LinhaHistorico>observableArrayList();
-        int totalItens = 0;
+
+        int totalItens  = 0;
         float totalValor = 0f;
         float totalMulta = 0f;
 
         for (Aluguel aluguel : alugueis) {
+
+            // Calcula multa UMA VEZ por aluguel (não por produto)
+            float multaDoAluguel = 0f;
+            String statusAluguel;
+
+            if ("Finalizado".equals(aluguel.getStatus())) {
+                statusAluguel = "Devolvido";
+            } else if (aluguel.getDataDevolucao() != null
+                    && aluguel.getDataDevolucao().isBefore(LocalDate.now())) {
+                long diasAtraso = LocalDate.now().toEpochDay()
+                        - aluguel.getDataDevolucao().toEpochDay();
+                multaDoAluguel = diasAtraso * MULTA_POR_DIA;
+                statusAluguel  = "Atrasado (" + diasAtraso + "d)";
+            } else {
+                statusAluguel = "Ativo";
+            }
+
+            // Acumula multa apenas uma vez por aluguel
+            totalMulta += multaDoAluguel;
+
+            String dataEmp = aluguel.getDataEmprestimo() != null
+                    ? aluguel.getDataEmprestimo().format(FMT) : "—";
+            String dataDev = aluguel.getDataDevolucao() != null
+                    ? aluguel.getDataDevolucao().format(FMT) : "—";
+
+            // Cria uma linha por produto, mas multa aparece só na primeira linha do aluguel
+            boolean primeiroItem = true;
             for (Produto produto : aluguel.getProdutos()) {
                 totalItens++;
 
@@ -102,32 +118,16 @@ public class HistoricoClienteController {
                     nomeProd += " — " + disco.getBanda();
                 }
 
-                String dataEmp = aluguel.getDataEmprestimo() != null
-                        ? aluguel.getDataEmprestimo().format(FMT) : "—";
-                String dataDev = aluguel.getDataDevolucao() != null
-                        ? aluguel.getDataDevolucao().format(FMT) : "—";
-
-                // Calcula multa por atraso
-                float multa = 0f;
-                String statusAluguel;
-                if ("Finalizado".equals(aluguel.getStatus())) {
-                    statusAluguel = "Devolvido";
-                } else if (aluguel.getDataDevolucao() != null
-                        && aluguel.getDataDevolucao().isBefore(LocalDate.now())) {
-                    long diasAtraso = LocalDate.now().toEpochDay()
-                            - aluguel.getDataDevolucao().toEpochDay();
-                    multa = diasAtraso * MULTA_POR_DIA;
-                    statusAluguel = "Atrasado (" + diasAtraso + "d)";
-                } else {
-                    statusAluguel = "Ativo";
-                }
-
                 float valorProduto = produto.getValorAluguel();
                 totalValor += valorProduto;
-                totalMulta += multa;
 
-                linhas.add(new LinhaHistorico(tipo, nomeProd, dataEmp, dataDev,
-                        statusAluguel, valorProduto, multa));
+                // Multa só aparece na primeira linha do aluguel; demais ficam com 0
+                linhas.add(new LinhaHistorico(
+                        tipo, nomeProd, dataEmp, dataDev,
+                        statusAluguel, valorProduto,
+                        primeiroItem ? multaDoAluguel : 0f
+                ));
+                primeiroItem = false;
             }
         }
 
@@ -137,9 +137,9 @@ public class HistoricoClienteController {
         labelTotalItens.setText("Itens: " + totalItens);
         labelTotalAlugueis.setText("Total de alugueis: " + alugueis.size());
         labelMulta.setText(String.format("Multa por atraso: R$ %.2f", totalMulta));
-        labelTotalValor.setText(String.format("Valor total: R$ %.2f", totalValor));
+        // Valor total = valor dos produtos + multa
+        labelTotalValor.setText(String.format("Valor total: R$ %.2f", totalValor + totalMulta));
 
-        // Destaca multa em vermelho só se houver
         labelMulta.setVisible(totalMulta > 0);
         labelMulta.setManaged(totalMulta > 0);
     }
@@ -168,7 +168,6 @@ public class HistoricoClienteController {
             }
         });
 
-        // Linhas com atraso ficam levemente rosadas
         tabelaHistorico.setRowFactory(tv -> new TableRow<>() {
             @Override
             protected void updateItem(LinhaHistorico item, boolean empty) {

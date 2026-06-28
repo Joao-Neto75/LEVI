@@ -15,14 +15,16 @@ public class AluguelDao extends AbstractDao<Aluguel> {
 
     @Override
     protected Aluguel executarInsercao(Connection con, Aluguel entity) throws SQLException {
-        String sql = "INSERT INTO alugueis (cliente_id, data_emprestimo, data_devolucao, valor_total, status) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO alugueis (cliente_id, data_emprestimo, data_prevista_devolucao, data_devolucao, valor_total, status, renovado) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         try (PreparedStatement stmt = con.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             stmt.setInt(1, entity.getCliente().getId());
             stmt.setDate(2, Date.valueOf(entity.getDataEmprestimo()));
-            stmt.setDate(3, entity.getDataDevolucao() != null ? Date.valueOf(entity.getDataDevolucao()) : null);
-            stmt.setFloat(4, entity.getValorTotal());
-            stmt.setString(5, entity.getStatus());
+            stmt.setDate(3, entity.getDataPrevistaDevolucao() != null ? Date.valueOf(entity.getDataPrevistaDevolucao()) : null);
+            stmt.setDate(4, entity.getDataDevolucao() != null ? Date.valueOf(entity.getDataDevolucao()) : null);
+            stmt.setFloat(5, entity.getValorTotal());
+            stmt.setString(6, entity.getStatus());
+            stmt.setBoolean(7, entity.isRenovado());
             stmt.execute();
 
             try (ResultSet rs = stmt.getGeneratedKeys()) {
@@ -49,13 +51,15 @@ public class AluguelDao extends AbstractDao<Aluguel> {
 
     @Override
     protected Aluguel executarAlteracao(Connection con, Aluguel entity) throws SQLException {
-        String sql = "UPDATE alugueis SET data_devolucao=?, valor_total=?, status=? WHERE id=?";
+        String sql = "UPDATE alugueis SET data_prevista_devolucao=?, data_devolucao=?, valor_total=?, status=?, renovado=? WHERE id=?";
 
         try (PreparedStatement stmt = con.prepareStatement(sql)) {
-            stmt.setDate(1, entity.getDataDevolucao() != null ? Date.valueOf(entity.getDataDevolucao()) : null);
-            stmt.setFloat(2, entity.getValorTotal());
-            stmt.setString(3, entity.getStatus());
-            stmt.setInt(4, entity.getId());
+            stmt.setDate(1, entity.getDataPrevistaDevolucao() != null ? Date.valueOf(entity.getDataPrevistaDevolucao()) : null);
+            stmt.setDate(2, entity.getDataDevolucao() != null ? Date.valueOf(entity.getDataDevolucao()) : null);
+            stmt.setFloat(3, entity.getValorTotal());
+            stmt.setString(4, entity.getStatus());
+            stmt.setBoolean(5, entity.isRenovado());
+            stmt.setInt(6, entity.getId());
             stmt.execute();
         }
         return entity;
@@ -76,9 +80,8 @@ public class AluguelDao extends AbstractDao<Aluguel> {
 
     @Override
     protected List<Aluguel> executarBusca(Connection con, String parametro) throws SQLException {
-        // Busca por CPF ou nome do cliente, já hidratando o objeto Cliente e os Produtos
         String sql =
-            "SELECT a.id, a.data_emprestimo, a.data_devolucao, a.valor_total, a.status, " +
+            "SELECT a.id, a.data_emprestimo, a.data_prevista_devolucao, a.data_devolucao, a.valor_total, a.status, a.renovado, " +
             "       c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.endereco AS c_end " +
             "FROM alugueis a " +
             "JOIN cliente c ON a.cliente_id = c.id " +
@@ -99,9 +102,8 @@ public class AluguelDao extends AbstractDao<Aluguel> {
 
     @Override
     protected List<Aluguel> executarListagem(Connection con) throws SQLException {
-        // JOIN com cliente para já trazer os dados completos
         String sql =
-            "SELECT a.id, a.data_emprestimo, a.data_devolucao, a.valor_total, a.status, " +
+            "SELECT a.id, a.data_emprestimo, a.data_prevista_devolucao, a.data_devolucao, a.valor_total, a.status, a.renovado, " +
             "       c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.endereco AS c_end " +
             "FROM alugueis a " +
             "JOIN cliente c ON a.cliente_id = c.id";
@@ -118,7 +120,7 @@ public class AluguelDao extends AbstractDao<Aluguel> {
 
     public List<Aluguel> buscarPorMes(int mes, int ano) {
         String sql =
-            "SELECT a.id, a.data_emprestimo, a.data_devolucao, a.valor_total, a.status, " +
+            "SELECT a.id, a.data_emprestimo, a.data_prevista_devolucao, a.data_devolucao, a.valor_total, a.status, a.renovado, " +
             "       c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.endereco AS c_end " +
             "FROM alugueis a " +
             "JOIN cliente c ON a.cliente_id = c.id " +
@@ -142,12 +144,53 @@ public class AluguelDao extends AbstractDao<Aluguel> {
         return lista;
     }
 
+    // Retorna todos os aluguéis ainda ativos (não devolvidos). Usado pela
+    // verificação de renovação automática, que só precisa olhar para estes.
+    public List<Aluguel> buscarAtivos() {
+        String sql =
+            "SELECT a.id, a.data_emprestimo, a.data_prevista_devolucao, a.data_devolucao, a.valor_total, a.status, a.renovado, " +
+            "       c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.endereco AS c_end " +
+            "FROM alugueis a " +
+            "JOIN cliente c ON a.cliente_id = c.id " +
+            "WHERE a.status = 'Ativo'";
+
+        List<Aluguel> lista = new ArrayList<>();
+        try (Connection con = ConnectionFactory.getInstance().getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                lista.add(mapearAluguelCompleto(rs, con));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro na busca de aluguéis ativos: " + e.getMessage());
+        } finally {
+            ConnectionFactory.getInstance().closeConnection();
+        }
+        return lista;
+    }
+
+    // Atualiza somente data_prevista_devolucao e renovado, usado depois de
+    // uma renovação automática (evita reescrever o aluguel inteiro).
+    public void salvarRenovacao(Aluguel aluguel) {
+        String sql = "UPDATE alugueis SET data_prevista_devolucao=?, renovado=? WHERE id=?";
+        try (Connection con = ConnectionFactory.getInstance().getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setDate(1, Date.valueOf(aluguel.getDataPrevistaDevolucao()));
+            stmt.setBoolean(2, aluguel.isRenovado());
+            stmt.setInt(3, aluguel.getId());
+            stmt.execute();
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao salvar renovação: " + e.getMessage());
+        } finally {
+            ConnectionFactory.getInstance().closeConnection();
+        }
+    }
+
     // Monta o Aluguel com Cliente e Produtos já hidratados
     private Aluguel mapearAluguelCompleto(ResultSet rs, Connection con) throws SQLException {
         Aluguel a = new Aluguel();
         a.setId(rs.getInt("id"));
 
-        // Hidratar Cliente completo
         Cliente c = new Cliente();
         c.setId(rs.getInt("c_id"));
         c.setNome(rs.getString("c_nome"));
@@ -157,6 +200,11 @@ public class AluguelDao extends AbstractDao<Aluguel> {
 
         a.setDataEmprestimo(rs.getDate("data_emprestimo").toLocalDate());
 
+        Date dataPrevista = rs.getDate("data_prevista_devolucao");
+        if (dataPrevista != null) {
+            a.setDataPrevistaDevolucao(dataPrevista.toLocalDate());
+        }
+
         Date dataDev = rs.getDate("data_devolucao");
         if (dataDev != null) {
             a.setDataDevolucao(dataDev.toLocalDate());
@@ -164,8 +212,8 @@ public class AluguelDao extends AbstractDao<Aluguel> {
 
         a.setValorTotal(rs.getFloat("valor_total"));
         a.setStatus(rs.getString("status"));
+        a.setRenovado(rs.getBoolean("renovado"));
 
-        // Hidratar Produtos (livros e discos) via tabela aluguel_produtos
         carregarProdutosDoAluguel(con, a);
 
         return a;
@@ -173,7 +221,6 @@ public class AluguelDao extends AbstractDao<Aluguel> {
 
     // Carrega os produtos (Livro ou Disco) de um aluguel diretamente no objeto
     private void carregarProdutosDoAluguel(Connection con, Aluguel aluguel) throws SQLException {
-        // Tenta carregar livros vinculados ao aluguel
         String sqlLivro =
             "SELECT l.* FROM livro l " +
             "JOIN aluguel_produtos ap ON l.id = ap.produto_id " +
@@ -192,13 +239,11 @@ public class AluguelDao extends AbstractDao<Aluguel> {
                     livro.setValorAluguel(rs.getFloat("valor_aluguel"));
                     Date ano = rs.getDate("ano");
                     if (ano != null) livro.setAno(ano.toLocalDate());
-                    // Adiciona direto na lista sem remover exemplar (já foi removido no aluguel)
                     aluguel.getProdutos().add(livro);
                 }
             }
         }
 
-        // Tenta carregar discos vinculados ao aluguel
         String sqlDisco =
             "SELECT d.* FROM disco d " +
             "JOIN aluguel_produtos ap ON d.id = ap.produto_id " +

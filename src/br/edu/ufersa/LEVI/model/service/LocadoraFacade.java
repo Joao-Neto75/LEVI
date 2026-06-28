@@ -121,6 +121,10 @@ public class LocadoraFacade {
         return aluguelService.buscarPorCliente(cliente);
     }
 
+    public List<Aluguel> processarRenovacoesAutomaticas() {
+        return aluguelService.processarRenovacoesAutomaticas();
+    }
+
     public float calcularFaturamentoMes(int mes, int ano) {
         return aluguelService.calcularFaturamentoMes(mes, ano);
     }

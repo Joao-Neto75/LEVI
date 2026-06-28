@@ -53,8 +53,8 @@ public class DashboardController {
 
     private void exibirFuncionarioLogado() {
         Funcionarios logado = SessaoUsuario.getFuncionarioLogado();
-        if (logado != null) {
-
+        if (logado != null && labelFuncionarioLogado != null) {
+            labelFuncionarioLogado.setText(logado.getNome());
         }
     }
 
@@ -70,7 +70,7 @@ public class DashboardController {
                 totalLivros + totalDiscos, totalLivros, totalDiscos));
 
         long alugueisAtivos = facade.listarAlugueis().stream()
-                .filter(a -> a.getDataDevolucao() == null)
+                .filter(a -> "Ativo".equals(a.getStatus()))
                 .count();
         labelAlugueisAtivos.setText("Aluguéis Ativos: " + alugueisAtivos);
 
@@ -80,14 +80,12 @@ public class DashboardController {
     private void carregarMaisBuscados() {
         List<String> itens = new ArrayList<>();
 
-        List<Livro> livros = facade.listarLivros();
-        livros.stream()
+        facade.listarLivros().stream()
                 .sorted((a, b) -> Integer.compare(b.getExemplares(), a.getExemplares()))
                 .limit(3)
                 .forEach(l -> itens.add("📖 " + l.getTitulo() + " — " + l.getAutor()));
 
-        List<Disco> discos = facade.listarDiscos();
-        discos.stream()
+        facade.listarDiscos().stream()
                 .sorted((a, b) -> Integer.compare(b.getExemplares(), a.getExemplares()))
                 .limit(2)
                 .forEach(d -> itens.add("🎵 " + d.getTitulo() + " — " + d.getBanda()));
@@ -101,23 +99,30 @@ public class DashboardController {
         LocalDate hoje = LocalDate.now();
         LocalDate limite = hoje.plusDays(7);
 
-        List<Aluguel> alugueis = facade.listarAlugueis();
-        for (Aluguel a : alugueis) {
-            if (a.getDataDevolucao() == null) continue;
-            LocalDate dev = a.getDataDevolucao();
-            if (!dev.isBefore(hoje) && !dev.isAfter(limite)) {
-                String nomeCliente = a.getCliente() != null ? a.getCliente().getNome() : "—";
-                itens.add("⚠ " + nomeCliente + " — devolução: " + dev.format(FMT));
-            }
-        }
+        for (Aluguel a : facade.listarAlugueis()) {
+            if (!"Ativo".equals(a.getStatus())) continue;
 
-        // Também mostra em aberto há mais de 7 dias
-        for (Aluguel a : alugueis) {
-            if (a.getDataDevolucao() != null) continue;
-            LocalDate emp = a.getDataEmprestimo();
-            if (emp != null && emp.plusDays(7).isBefore(hoje)) {
-                String nomeCliente = a.getCliente() != null ? a.getCliente().getNome() : "—";
-                itens.add("🔴 " + nomeCliente + " — desde: " + emp.format(FMT));
+            // Usa dataPrevistaDevolucao se disponível, senão cai para dataDevolucao
+            LocalDate dataRef = a.getDataPrevistaDevolucao() != null
+                    ? a.getDataPrevistaDevolucao()
+                    : a.getDataDevolucao();
+
+            if (dataRef == null) continue;
+
+            String nomeCliente = a.getCliente() != null ? a.getCliente().getNome() : "—";
+
+            if (dataRef.isBefore(hoje)) {
+                // Atrasado
+                long dias = java.time.temporal.ChronoUnit.DAYS.between(dataRef, hoje);
+                itens.add("🔴 " + nomeCliente + " — " + dias + " dia(s) em atraso");
+            } else if (!dataRef.isAfter(limite)) {
+                // Vence nos próximos 7 dias
+                if (dataRef.isEqual(hoje)) {
+                    itens.add("⚠ " + nomeCliente + " — vence hoje (" + dataRef.format(FMT) + ")");
+                } else {
+                    long dias = java.time.temporal.ChronoUnit.DAYS.between(hoje, dataRef);
+                    itens.add("⚠ " + nomeCliente + " — vence em " + dias + " dia(s) (" + dataRef.format(FMT) + ")");
+                }
             }
         }
 
@@ -129,17 +134,27 @@ public class DashboardController {
         List<String> itens = new ArrayList<>();
         LocalDate hoje = LocalDate.now();
 
-        List<Aluguel> alugueis = facade.listarAlugueis();
-        for (Aluguel a : alugueis) {
-            if (a.getDataDevolucao() == null) continue;
-            if (a.getDataDevolucao().isBefore(hoje)) {
+        for (Aluguel a : facade.listarAlugueis()) {
+            if (!"Ativo".equals(a.getStatus())) continue;
+            if (a.getDataPrevistaDevolucao() == null) continue;
+
+            // Renovação automática: aluguel que vence em até 2 dias e ainda não foi renovado
+            long diasParaVencer = java.time.temporal.ChronoUnit.DAYS
+                    .between(hoje, a.getDataPrevistaDevolucao());
+
+            if (diasParaVencer >= 0 && diasParaVencer <= 2 && !a.isRenovado()) {
                 String nomeCliente = a.getCliente() != null ? a.getCliente().getNome() : "—";
-                long dias = java.time.temporal.ChronoUnit.DAYS.between(a.getDataDevolucao(), hoje);
-                itens.add("❗ " + nomeCliente + " — " + dias + " dia(s) em atraso");
+                LocalDate novaData = a.getDataPrevistaDevolucao().plusDays(7);
+
+                String produto = a.getProdutos().isEmpty() ? "item"
+                        : a.getProdutos().get(0).getTitulo();
+
+                itens.add("🔄 " + nomeCliente + " — \"" + produto
+                        + "\" → Nova data: " + novaData.format(FMT));
             }
         }
 
-        if (itens.isEmpty()) itens.add("✅ Nenhum aluguel em atraso.");
+        if (itens.isEmpty()) itens.add("✅ Nenhuma renovação automática pendente.");
         listaRenovacoes.setItems(FXCollections.observableArrayList(itens));
     }
 
@@ -149,16 +164,16 @@ public class DashboardController {
         return meses[mes - 1];
     }
 
-    @FXML public void abrirLivros() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaLivros.fxml", "Duduteca - Livros"); }
-    @FXML public void abrirDiscos() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaDiscos.fxml", "Duduteca - Discos"); }
-    @FXML public void abrirClientes() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaClientes.fxml", "Duduteca - Clientes"); }
-    @FXML public void abrirAlugueis() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaAlugueis.fxml", "Duduteca - Aluguéis"); }
+    @FXML public void abrirLivros()    { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaLivros.fxml",    "Duduteca - Livros"); }
+    @FXML public void abrirDiscos()    { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaDiscos.fxml",    "Duduteca - Discos"); }
+    @FXML public void abrirClientes()  { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaClientes.fxml",  "Duduteca - Clientes"); }
+    @FXML public void abrirAlugueis()  { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaAlugueis.fxml",  "Duduteca - Aluguéis"); }
     @FXML public void abrirRelatorio() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaRelatorio.fxml", "Duduteca - Relatório"); }
     @FXML public void abrirDashboard() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaDashboard.fxml", "Duduteca - Dashboard"); }
-    @FXML public void handleSair() { SessaoUsuario.encerrarSessao(); navegar("/br/edu/ufersa/LEVI/view/fxml/TelaLogin.fxml", "Duduteca - Login"); }
+    @FXML public void handleSair()     { SessaoUsuario.encerrarSessao(); navegar("/br/edu/ufersa/LEVI/view/fxml/TelaLogin.fxml", "Duduteca - Login"); }
 
     private void navegar(String fxml, String titulo) {
         try { App.trocarTela(fxml, titulo); }
-        catch (IOException e) { labelFuncionarioLogado.setText("Erro: " + e.getMessage()); }
+        catch (IOException e) { System.err.println("Erro ao navegar: " + e.getMessage()); }
     }
 }

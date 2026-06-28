@@ -5,6 +5,7 @@ import br.edu.ufersa.LEVI.model.entity.Aluguel;
 import br.edu.ufersa.LEVI.model.entity.Cliente;
 import br.edu.ufersa.LEVI.model.entity.Produto;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AluguelService {
@@ -64,5 +65,25 @@ public class AluguelService {
 
     public List<Aluguel> buscarPorCliente(Cliente c) {
         return dao.buscar(c.getCpf());
+    }
+
+    // Verifica todos os aluguéis ativos e renova automaticamente quem está
+    // a 1-2 dias de vencer (regra implementada em Aluguel.verificarERenovarSeNecessario).
+    // Persiste no banco cada renovação aplicada e devolve a lista dos
+    // aluguéis que de fato foram renovados nesta chamada, para a tela
+    // de dashboard poder exibi-los no card "Renovações automáticas".
+    public List<Aluguel> processarRenovacoesAutomaticas() {
+        List<Aluguel> renovados = new ArrayList<>();
+        LocalDate hoje = LocalDate.now();
+
+        List<Aluguel> ativos = dao.buscarAtivos();
+        for (Aluguel aluguel : ativos) {
+            boolean foiRenovado = aluguel.verificarERenovarSeNecessario(hoje);
+            if (foiRenovado) {
+                dao.salvarRenovacao(aluguel);
+                renovados.add(aluguel);
+            }
+        }
+        return renovados;
     }
 }
