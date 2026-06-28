@@ -5,60 +5,40 @@
 <?import javafx.scene.layout.*?>
 
 <BorderPane prefHeight="650.0" prefWidth="1000.0"
-    stylesheets="@../css/duduteca.css"
-    xmlns="http://javafx.com/javafx/17"
-    xmlns:fx="http://javafx.com/fxml/1"
-    fx:controller="br.edu.ufersa.LEVI.view.Controller.ClientesController">
+            stylesheets="@../css/duduteca.css"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="br.edu.ufersa.LEVI.view.Controller.ClientesController">
 
     <left>
         <VBox styleClass="sidebar" spacing="0">
             <padding><Insets top="30" right="20" bottom="30" left="24"/></padding>
             <children>
                 <Button onAction="#abrirDashboard" styleClass="sidebar-btn" style="-fx-padding: 0; -fx-background-color: transparent;">
-                    <graphic>
-                        <Label text="DUDUTECA" styleClass="sidebar-title">
-                            <VBox.margin><Insets bottom="36"/></VBox.margin>
-                        </Label>
-                    </graphic>
+                    <graphic><Label text="DUDUTECA" styleClass="sidebar-title"/></graphic>
                     <VBox.margin><Insets bottom="36"/></VBox.margin>
                 </Button>
-                <Button text="Livros" styleClass="sidebar-btn"
-                        onAction="#abrirLivros" maxWidth="Infinity">
-                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
-                        <image><Image url="@../icons/livro.png"/></image>
-                    </ImageView></graphic>
+                <Button text="Livros" styleClass="sidebar-btn" onAction="#abrirLivros" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true"><image><Image url="@../icons/livro.png"/></image></ImageView></graphic>
                     <VBox.margin><Insets bottom="24"/></VBox.margin>
                 </Button>
-                <Button text="Discos" styleClass="sidebar-btn"
-                        onAction="#abrirDiscos" maxWidth="Infinity">
-                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
-                        <image><Image url="@../icons/disco.png"/></image>
-                    </ImageView></graphic>
+                <Button text="Discos" styleClass="sidebar-btn" onAction="#abrirDiscos" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true"><image><Image url="@../icons/disco.png"/></image></ImageView></graphic>
                     <VBox.margin><Insets bottom="24"/></VBox.margin>
                 </Button>
-                <Button text="Clientes" styleClass="sidebar-btn, sidebar-btn-active"
-                        onAction="#abrirClientes" maxWidth="Infinity">
-                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
-                        <image><Image url="@../icons/cliente.png"/></image>
-                    </ImageView></graphic>
+                <Button text="Clientes" styleClass="sidebar-btn, sidebar-btn-active" onAction="#abrirClientes" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true"><image><Image url="@../icons/cliente.png"/></image></ImageView></graphic>
                     <VBox.margin><Insets bottom="24"/></VBox.margin>
                 </Button>
-                <Button text="Alugueis" styleClass="sidebar-btn"
-                        onAction="#abrirAlugueis" maxWidth="Infinity">
-                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
-                        <image><Image url="@../icons/aluguel.png"/></image>
-                    </ImageView></graphic>
+                <Button text="Alugueis" styleClass="sidebar-btn" onAction="#abrirAlugueis" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true"><image><Image url="@../icons/aluguel.png"/></image></ImageView></graphic>
                     <VBox.margin><Insets bottom="24"/></VBox.margin>
                 </Button>
-                <Button text="Relatório" styleClass="sidebar-btn"
-                        onAction="#abrirRelatorio" maxWidth="Infinity">
-                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
-                        <image><Image url="@../icons/relatorio.png"/></image>
-                    </ImageView></graphic>
+                <Button text="Relatório" styleClass="sidebar-btn" onAction="#abrirRelatorio" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true"><image><Image url="@../icons/relatorio.png"/></image></ImageView></graphic>
                 </Button>
                 <Region VBox.vgrow="ALWAYS"/>
-                <Button text="Sair" styleClass="sidebar-sair"
-                        onAction="#handleSair" maxWidth="Infinity"/>
+                <Button text="Sair" styleClass="sidebar-sair" onAction="#handleSair" maxWidth="Infinity"/>
             </children>
         </VBox>
     </left>
@@ -81,33 +61,22 @@
                     </children>
                 </HBox>
 
-                <Label fx:id="labelErro" style="-fx-text-fill: red; -fx-font-size: 12px;"/>
+                <Label fx:id="labelErro" styleClass="error-label"/>
 
-                <!-- Formulário oculto — StackPane conforme ClientesController -->
                 <StackPane fx:id="painelFormulario" visible="false" managed="false">
                     <children>
-                        <VBox spacing="10"
-                              style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #E0D5C8; -fx-border-radius: 10;">
+                        <VBox spacing="10" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #E0D5C8; -fx-border-radius: 10;">
                             <padding><Insets top="16" right="20" bottom="16" left="20"/></padding>
                             <children>
                                 <Label fx:id="labelTituloForm" text="Adicionar Cliente" style="-fx-font-size:16px; -fx-font-weight:bold;"/>
                                 <HBox spacing="16" alignment="CENTER_LEFT">
                                     <children>
-                                        <VBox spacing="4"><children>
-                                            <Label text="Nome" style="-fx-font-size:12px;"/>
-                                            <TextField fx:id="fieldNome" prefWidth="200" styleClass="search-field"/>
-                                        </children></VBox>
-                                        <VBox spacing="4"><children>
-                                            <Label text="CPF" style="-fx-font-size:12px;"/>
-                                            <TextField fx:id="fieldCpf" prefWidth="160" styleClass="search-field"/>
-                                        </children></VBox>
-                                        <VBox spacing="4"><children>
-                                            <Label text="Endereço" style="-fx-font-size:12px;"/>
-                                            <TextField fx:id="fieldEndereco" prefWidth="240" styleClass="search-field"/>
-                                        </children></VBox>
+                                        <VBox spacing="4"><children><Label text="Nome" style="-fx-font-size:12px;"/><TextField fx:id="fieldNome" prefWidth="200" styleClass="search-field"/></children></VBox>
+                                        <VBox spacing="4"><children><Label text="CPF" style="-fx-font-size:12px;"/><TextField fx:id="fieldCpf" prefWidth="160" styleClass="search-field"/></children></VBox>
+                                        <VBox spacing="4"><children><Label text="Endereço" style="-fx-font-size:12px;"/><TextField fx:id="fieldEndereco" prefWidth="240" styleClass="search-field"/></children></VBox>
                                     </children>
                                 </HBox>
-                                <Label fx:id="labelErroForm" style="-fx-text-fill: red; -fx-font-size: 12px;"/>
+                                <Label fx:id="labelErroForm" styleClass="error-label"/>
                                 <HBox spacing="10">
                                     <children>
                                         <Button text="Salvar" styleClass="btn-primary" onAction="#handleSalvar"/>
