@@ -1,6 +1,7 @@
 package br.edu.ufersa.LEVI.model.service;
 
 import br.edu.ufersa.LEVI.model.dao.AluguelDao;
+import br.edu.ufersa.LEVI.model.exception.ProdutoIndisponivelException;
 import br.edu.ufersa.LEVI.model.entity.Aluguel;
 import br.edu.ufersa.LEVI.model.entity.Cliente;
 import br.edu.ufersa.LEVI.model.entity.Produto;
@@ -23,7 +24,7 @@ public class AluguelService {
         // Regra: verifica disponibilidade de cada produto
         for (Produto p : entity.getProdutos()) {
             if (!p.verificarDisponibilidade()) {
-                throw new RuntimeException("Produto indisponível: " + p.getTitulo());
+                throw new ProdutoIndisponivelException(p.getTitulo());
             }
         }
         return dao.inserir(entity);

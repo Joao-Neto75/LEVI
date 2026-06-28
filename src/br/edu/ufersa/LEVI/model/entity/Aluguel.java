@@ -1,5 +1,6 @@
 package br.edu.ufersa.LEVI.model.entity;
 
+import br.edu.ufersa.LEVI.model.exception.ProdutoIndisponivelException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,13 +46,15 @@ public class Aluguel {
 
     // Métodos
     public void adicionarProduto(Produto p) {
-        if (p != null && p.verificarDisponibilidade()) {
-            produtos.add(p);
-            p.removerExemplar(1);
-            calcularValorTotal();
-        } else {
-            throw new RuntimeException("Produto indisponível ou inválido!");
+        if (p == null) {
+            throw new ProdutoIndisponivelException("(produto nulo)");
         }
+        if (!p.verificarDisponibilidade()) {
+            throw new ProdutoIndisponivelException(p.getTitulo());
+        }
+        produtos.add(p);
+        p.removerExemplar(1);
+        calcularValorTotal();
     }
 
     public float calcularValorTotal() {

@@ -2,6 +2,7 @@ package br.edu.ufersa.LEVI.view.Controller;
 
 import br.edu.ufersa.LEVI.App;
 import br.edu.ufersa.LEVI.model.entity.Funcionarios;
+import br.edu.ufersa.LEVI.model.exception.AutenticacaoException;
 import br.edu.ufersa.LEVI.model.service.LocadoraFacade;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -34,13 +35,13 @@ public class LoginController {
 
             App.trocarTela("/br/edu/ufersa/LEVI/view/fxml/TelaDashboard.fxml", "Duduteca - Dashboard");
 
-        } catch (RuntimeException e) {
+        } catch (AutenticacaoException e) {
             labelErro.setText(e.getMessage());
-            // TEMPORÁRIO: imprime o stack trace completo no console para diagnosticar
+        } catch (RuntimeException e) {
+            labelErro.setText("Erro inesperado: " + e.getMessage());
             e.printStackTrace();
         } catch (IOException e) {
             labelErro.setText("Erro ao carregar a próxima tela. Avise o grupo!");
-            // TEMPORÁRIO: imprime o stack trace completo no console para diagnosticar
             e.printStackTrace();
         }
     }

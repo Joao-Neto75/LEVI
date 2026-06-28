@@ -6,6 +6,7 @@ import br.edu.ufersa.LEVI.model.entity.Cliente;
 import br.edu.ufersa.LEVI.model.entity.Disco;
 import br.edu.ufersa.LEVI.model.entity.Livro;
 import br.edu.ufersa.LEVI.model.entity.Produto;
+import br.edu.ufersa.LEVI.model.exception.ProdutoIndisponivelException;
 import br.edu.ufersa.LEVI.model.service.LocadoraFacade;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -197,6 +198,9 @@ public class AlugueisController {
 
             carregarAlugueis();
 
+        } catch (ProdutoIndisponivelException e) {
+            labelErroForm.setText("Produto indisponível: " + e.getTituloProduto() +
+                                  " — não há exemplares disponíveis para aluguel.");
         } catch (Exception e) {
             labelErroForm.setText("Erro: " + e.getMessage());
         }

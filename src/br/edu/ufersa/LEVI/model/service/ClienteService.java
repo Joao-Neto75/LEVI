@@ -1,6 +1,9 @@
 package br.edu.ufersa.LEVI.model.service;
 
+import br.edu.ufersa.LEVI.model.dao.AluguelDao;
 import br.edu.ufersa.LEVI.model.dao.ClienteDao;
+import br.edu.ufersa.LEVI.model.entity.Aluguel;
+import br.edu.ufersa.LEVI.model.exception.AluguelAtivoException;
 import br.edu.ufersa.LEVI.model.entity.Cliente;
 import java.util.List;
 
@@ -34,6 +37,11 @@ public class ClienteService {
     public void excluirCliente(Cliente cliente) throws Exception {
         if (cliente.getId() <= 0) {
             throw new Exception("Para excluir, o cliente precisa ter um ID válido.");
+        }
+        // Bloqueia exclusão se o cliente ainda tiver alugueis ativos
+        List<Aluguel> ativos = new AluguelDao().buscarAtivosPorCliente(cliente);
+        if (!ativos.isEmpty()) {
+            throw new AluguelAtivoException(cliente.getNome(), ativos.size());
         }
         clienteDao.deletar(cliente);
     }

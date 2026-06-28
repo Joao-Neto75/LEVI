@@ -1,5 +1,6 @@
 package br.edu.ufersa.LEVI.model.entity;
 
+import br.edu.ufersa.LEVI.model.exception.EstoqueInsuficienteException;
 import java.time.LocalDate;
 
 public abstract class Produto implements Pesquisavel{
@@ -40,7 +41,7 @@ public abstract class Produto implements Pesquisavel{
         if (quantidade <= 0)
             throw new IllegalArgumentException("Quantidade deve ser maior que zero!");
         if (quantidade > this.exemplares)
-            throw new IllegalArgumentException("Quantidade maior que o estoque disponível!");
+            throw new EstoqueInsuficienteException(getTitulo(), this.exemplares, quantidade);
         this.exemplares -= quantidade;
     }
 

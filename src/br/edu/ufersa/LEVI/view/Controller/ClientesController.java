@@ -3,6 +3,7 @@ package br.edu.ufersa.LEVI.view.Controller;
 import br.edu.ufersa.LEVI.App;
 import br.edu.ufersa.LEVI.model.entity.Aluguel;
 import br.edu.ufersa.LEVI.model.entity.Cliente;
+import br.edu.ufersa.LEVI.model.exception.AluguelAtivoException;
 import br.edu.ufersa.LEVI.model.service.LocadoraFacade;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
@@ -84,12 +85,15 @@ public class ClientesController {
         colAcoes.setCellFactory(col -> new TableCell<>() {
             private final Button btnEditar    = new Button("✏");
             private final Button btnHistorico = new Button("📋");
-            private final HBox box = new HBox(6, btnHistorico, btnEditar);
+            private final Button btnExcluir   = new Button("🗑");
+            private final HBox box = new HBox(6, btnHistorico, btnEditar, btnExcluir);
             {
                 btnEditar.setStyle("-fx-background-color: transparent; -fx-font-size: 15px; -fx-cursor: hand;");
                 btnHistorico.setStyle("-fx-background-color: transparent; -fx-font-size: 15px; -fx-cursor: hand;");
+                btnExcluir.setStyle("-fx-background-color: transparent; -fx-font-size: 15px; -fx-cursor: hand;");
                 btnHistorico.setTooltip(new Tooltip("Ver histórico"));
                 btnEditar.setTooltip(new Tooltip("Editar cliente"));
+                btnExcluir.setTooltip(new Tooltip("Excluir cliente"));
 
                 btnEditar.setOnAction(e -> {
                     Cliente c = getTableView().getItems().get(getIndex());
@@ -98,6 +102,10 @@ public class ClientesController {
                 btnHistorico.setOnAction(e -> {
                     Cliente c = getTableView().getItems().get(getIndex());
                     abrirHistorico(c);
+                });
+                btnExcluir.setOnAction(e -> {
+                    Cliente c = getTableView().getItems().get(getIndex());
+                    confirmarExclusao(c);
                 });
             }
 
@@ -206,6 +214,26 @@ public class ClientesController {
         } catch (Exception e) {
             labelErroForm.setText("Erro: " + e.getMessage());
         }
+    }
+
+    private void confirmarExclusao(Cliente cliente) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
+                "Excluir o cliente \"" + cliente.getNome() + "\"?",
+                ButtonType.YES, ButtonType.NO);
+        alert.setTitle("Confirmar exclusão");
+        alert.showAndWait().ifPresent(btn -> {
+            if (btn == ButtonType.YES) {
+                try {
+                    facade.excluirCliente(cliente);
+                    carregarClientes(facade.listarClientes());
+                    labelErro.setText("");
+                } catch (AluguelAtivoException e) {
+                    labelErro.setText(e.getMessage());
+                } catch (Exception e) {
+                    labelErro.setText("Erro ao excluir: " + e.getMessage());
+                }
+            }
+        });
     }
 
     @FXML public void handleCancelar() { mostrarFormulario(false); }

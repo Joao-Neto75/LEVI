@@ -169,6 +169,33 @@ public class AluguelDao extends AbstractDao<Aluguel> {
         return lista;
     }
 
+    // Retorna apenas os alugueis ativos de um cliente específico.
+    // Usado por ClienteService para impedir exclusão de clientes com itens em aberto.
+    public List<Aluguel> buscarAtivosPorCliente(br.edu.ufersa.LEVI.model.entity.Cliente cliente) {
+        String sql =
+            "SELECT a.id, a.data_emprestimo, a.data_prevista_devolucao, a.data_devolucao, a.valor_total, a.status, a.renovado, " +
+            "       c.id AS c_id, c.nome AS c_nome, c.cpf AS c_cpf, c.endereco AS c_end " +
+            "FROM alugueis a " +
+            "JOIN cliente c ON a.cliente_id = c.id " +
+            "WHERE a.status = 'Ativo' AND c.id = ?";
+
+        List<Aluguel> lista = new ArrayList<>();
+        try (Connection con = ConnectionFactory.getInstance().getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setInt(1, cliente.getId());
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    lista.add(mapearAluguelCompleto(rs, con));
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Erro ao buscar aluguéis ativos do cliente: " + e.getMessage());
+        } finally {
+            ConnectionFactory.getInstance().closeConnection();
+        }
+        return lista;
+    }
+
     // Atualiza somente data_prevista_devolucao e renovado, usado depois de
     // uma renovação automática (evita reescrever o aluguel inteiro).
     public void salvarRenovacao(Aluguel aluguel) {
