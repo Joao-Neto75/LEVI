@@ -5,60 +5,40 @@
 <?import javafx.scene.layout.*?>
 
 <BorderPane prefHeight="650.0" prefWidth="1000.0"
-    stylesheets="@../css/duduteca.css"
-    xmlns="http://javafx.com/javafx/17"
-    xmlns:fx="http://javafx.com/fxml/1"
-    fx:controller="br.edu.ufersa.LEVI.view.Controller.AlugueisController">
+            stylesheets="@../css/duduteca.css"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="br.edu.ufersa.LEVI.view.Controller.AlugueisController">
 
     <left>
         <VBox styleClass="sidebar" spacing="0">
             <padding><Insets top="30" right="20" bottom="30" left="24"/></padding>
             <children>
                 <Button onAction="#abrirDashboard" styleClass="sidebar-btn" style="-fx-padding: 0; -fx-background-color: transparent;">
-                    <graphic>
-                        <Label text="DUDUTECA" styleClass="sidebar-title">
-                            <VBox.margin><Insets bottom="36"/></VBox.margin>
-                        </Label>
-                    </graphic>
+                    <graphic><Label text="DUDUTECA" styleClass="sidebar-title"/></graphic>
                     <VBox.margin><Insets bottom="36"/></VBox.margin>
                 </Button>
-                <Button text="Livros" styleClass="sidebar-btn"
-                        onAction="#abrirLivros" maxWidth="Infinity">
-                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
-                        <image><Image url="@../icons/livro.png"/></image>
-                    </ImageView></graphic>
+                <Button text="Livros" styleClass="sidebar-btn" onAction="#abrirLivros" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true"><image><Image url="@../icons/livro.png"/></image></ImageView></graphic>
                     <VBox.margin><Insets bottom="24"/></VBox.margin>
                 </Button>
-                <Button text="Discos" styleClass="sidebar-btn"
-                        onAction="#abrirDiscos" maxWidth="Infinity">
-                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
-                        <image><Image url="@../icons/disco.png"/></image>
-                    </ImageView></graphic>
+                <Button text="Discos" styleClass="sidebar-btn" onAction="#abrirDiscos" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true"><image><Image url="@../icons/disco.png"/></image></ImageView></graphic>
                     <VBox.margin><Insets bottom="24"/></VBox.margin>
                 </Button>
-                <Button text="Clientes" styleClass="sidebar-btn"
-                        onAction="#abrirClientes" maxWidth="Infinity">
-                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
-                        <image><Image url="@../icons/cliente.png"/></image>
-                    </ImageView></graphic>
+                <Button text="Clientes" styleClass="sidebar-btn" onAction="#abrirClientes" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true"><image><Image url="@../icons/cliente.png"/></image></ImageView></graphic>
                     <VBox.margin><Insets bottom="24"/></VBox.margin>
                 </Button>
-                <Button text="Alugueis" styleClass="sidebar-btn, sidebar-btn-active"
-                        onAction="#abrirAlugueis" maxWidth="Infinity">
-                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
-                        <image><Image url="@../icons/aluguel.png"/></image>
-                    </ImageView></graphic>
+                <Button text="Alugueis" styleClass="sidebar-btn, sidebar-btn-active" onAction="#abrirAlugueis" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true"><image><Image url="@../icons/aluguel.png"/></image></ImageView></graphic>
                     <VBox.margin><Insets bottom="24"/></VBox.margin>
                 </Button>
-                <Button text="Relatório" styleClass="sidebar-btn"
-                        onAction="#abrirRelatorio" maxWidth="Infinity">
-                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
-                        <image><Image url="@../icons/relatorio.png"/></image>
-                    </ImageView></graphic>
+                <Button text="Relatório" styleClass="sidebar-btn" onAction="#abrirRelatorio" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true"><image><Image url="@../icons/relatorio.png"/></image></ImageView></graphic>
                 </Button>
                 <Region VBox.vgrow="ALWAYS"/>
-                <Button text="Sair" styleClass="sidebar-sair"
-                        onAction="#handleSair" maxWidth="Infinity"/>
+                <Button text="Sair" styleClass="sidebar-sair" onAction="#handleSair" maxWidth="Infinity"/>
             </children>
         </VBox>
     </left>
@@ -69,50 +49,29 @@
             <children>
                 <Label text="Gerenciamento de Alugueis" styleClass="page-title"/>
 
-                <!-- Formulário Novo Aluguel -->
-                <VBox spacing="12"
-                      style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #E0D5C8; -fx-border-radius: 10;">
+                <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #E0D5C8; -fx-border-radius: 10;">
                     <padding><Insets top="16" right="20" bottom="16" left="20"/></padding>
                     <children>
                         <Label text="Novo Aluguel" style="-fx-font-size:16px; -fx-font-weight:bold;"/>
                         <HBox spacing="16" alignment="CENTER_LEFT">
                             <children>
-                                <VBox spacing="4"><children>
-                                    <Label text="Cliente" style="-fx-font-size:12px;"/>
-                                    <ComboBox fx:id="comboCliente" prefWidth="160"/>
-                                </children></VBox>
-                                <VBox spacing="4"><children>
-                                    <Label text="Livro" style="-fx-font-size:12px;"/>
-                                    <ComboBox fx:id="comboLivro" prefWidth="180"/>
-                                </children></VBox>
-                                <VBox spacing="4"><children>
-                                    <Label text="Disco" style="-fx-font-size:12px;"/>
-                                    <ComboBox fx:id="comboDisco" prefWidth="180"/>
-                                </children></VBox>
-                                <VBox spacing="4"><children>
-                                    <Label text="Data Início" style="-fx-font-size:12px;"/>
-                                    <DatePicker fx:id="dataEmprestimo" prefWidth="130"/>
-                                </children></VBox>
-                                <VBox spacing="4"><children>
-                                    <Label text="Data Devolução" style="-fx-font-size:12px;"/>
-                                    <DatePicker fx:id="dataDevolucao" prefWidth="130"/>
-                                </children></VBox>
-                                <VBox spacing="4"><children>
-                                    <Label text="Valor Total" style="-fx-font-size:12px;"/>
-                                    <Label fx:id="labelValorTotal" text="R$ 0,00" style="-fx-font-size:15px; -fx-font-weight:bold;"/>
-                                </children></VBox>
+                                <VBox spacing="4"><children><Label text="Cliente" style="-fx-font-size:12px;"/><ComboBox fx:id="comboCliente" prefWidth="160"/></children></VBox>
+                                <VBox spacing="4"><children><Label text="Livro" style="-fx-font-size:12px;"/><ComboBox fx:id="comboLivro" prefWidth="180"/></children></VBox>
+                                <VBox spacing="4"><children><Label text="Disco" style="-fx-font-size:12px;"/><ComboBox fx:id="comboDisco" prefWidth="180"/></children></VBox>
+                                <VBox spacing="4"><children><Label text="Data Início" style="-fx-font-size:12px;"/><DatePicker fx:id="dataEmprestimo" prefWidth="130"/></children></VBox>
+                                <VBox spacing="4"><children><Label text="Data Devolução" style="-fx-font-size:12px;"/><DatePicker fx:id="dataDevolucao" prefWidth="130"/></children></VBox>
+                                <VBox spacing="4"><children><Label text="Valor Total" style="-fx-font-size:12px;"/><Label fx:id="labelValorTotal" text="R$ 0,00" style="-fx-font-size:15px; -fx-font-weight:bold;"/></children></VBox>
                                 <Region HBox.hgrow="ALWAYS"/>
                                 <Button text="Registrar Aluguel" styleClass="btn-primary" onAction="#handleNovoAluguel"/>
                             </children>
                         </HBox>
-                        <Label fx:id="labelErroForm" style="-fx-text-fill: red; -fx-font-size: 12px;"/>
+                        <Label fx:id="labelErroForm" styleClass="error-label"/>
                     </children>
                 </VBox>
 
-                <!-- Botão Registrar Devolução -->
                 <HBox alignment="CENTER_RIGHT" spacing="10">
                     <children>
-                        <Label fx:id="labelErro" style="-fx-text-fill: red; -fx-font-size: 12px;" HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="labelErro" styleClass="error-label" HBox.hgrow="ALWAYS"/>
                         <Button text="Registrar Devolução (item selecionado)" styleClass="search-btn" onAction="#handleDevolucao"/>
                     </children>
                 </HBox>
