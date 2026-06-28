@@ -2,16 +2,11 @@ package br.edu.ufersa.LEVI.view.Controller;
 
 import br.edu.ufersa.LEVI.model.entity.Funcionarios;
 
-// Guarda o funcionário que fez login enquanto o programa estiver aberto.
-// Qualquer controller pode chamar SessaoUsuario.getFuncionarioLogado()
-// para saber quem está usando o sistema no momento.
 public class SessaoUsuario {
 
     private static Funcionarios funcionarioLogado;
 
-    private SessaoUsuario() {
-        // classe utilitária, não deve ser instanciada
-    }
+    private SessaoUsuario() {}
 
     public static void setFuncionarioLogado(Funcionarios funcionario) {
         funcionarioLogado = funcionario;
@@ -23,5 +18,11 @@ public class SessaoUsuario {
 
     public static void encerrarSessao() {
         funcionarioLogado = null;
+    }
+
+    // Retorna true se o funcionário logado for Gerente
+    public static boolean isGerente() {
+        return funcionarioLogado != null
+            && "Gerente".equalsIgnoreCase(funcionarioLogado.getCargo());
     }
 }

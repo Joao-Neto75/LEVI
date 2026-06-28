@@ -14,28 +14,47 @@
         <VBox styleClass="sidebar" spacing="0">
             <padding><Insets top="30" right="20" bottom="30" left="24"/></padding>
             <children>
-                <Button onAction="#abrirDashboard" styleClass="sidebar-btn" style="-fx-padding: 0; -fx-background-color: transparent;">
+                <Button onAction="#abrirDashboard" styleClass="sidebar-btn"
+                        style="-fx-padding: 0; -fx-background-color: transparent;">
                     <graphic><Label text="DUDUTECA" styleClass="sidebar-title"/></graphic>
                     <VBox.margin><Insets bottom="36"/></VBox.margin>
                 </Button>
                 <Button text="Livros" styleClass="sidebar-btn" onAction="#abrirLivros" maxWidth="Infinity">
-                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true"><image><Image url="@../icons/livro.png"/></image></ImageView></graphic>
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
+                        <image><Image url="@../icons/livro.png"/></image>
+                    </ImageView></graphic>
                     <VBox.margin><Insets bottom="24"/></VBox.margin>
                 </Button>
                 <Button text="Discos" styleClass="sidebar-btn, sidebar-btn-active" onAction="#abrirDiscos" maxWidth="Infinity">
-                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true"><image><Image url="@../icons/disco.png"/></image></ImageView></graphic>
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
+                        <image><Image url="@../icons/disco.png"/></image>
+                    </ImageView></graphic>
                     <VBox.margin><Insets bottom="24"/></VBox.margin>
                 </Button>
                 <Button text="Clientes" styleClass="sidebar-btn" onAction="#abrirClientes" maxWidth="Infinity">
-                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true"><image><Image url="@../icons/cliente.png"/></image></ImageView></graphic>
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
+                        <image><Image url="@../icons/cliente.png"/></image>
+                    </ImageView></graphic>
                     <VBox.margin><Insets bottom="24"/></VBox.margin>
                 </Button>
                 <Button text="Alugueis" styleClass="sidebar-btn" onAction="#abrirAlugueis" maxWidth="Infinity">
-                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true"><image><Image url="@../icons/aluguel.png"/></image></ImageView></graphic>
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
+                        <image><Image url="@../icons/aluguel.png"/></image>
+                    </ImageView></graphic>
                     <VBox.margin><Insets bottom="24"/></VBox.margin>
                 </Button>
                 <Button text="Relatório" styleClass="sidebar-btn" onAction="#abrirRelatorio" maxWidth="Infinity">
-                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true"><image><Image url="@../icons/relatorio.png"/></image></ImageView></graphic>
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
+                        <image><Image url="@../icons/relatorio.png"/></image>
+                    </ImageView></graphic>
+                    <VBox.margin><Insets bottom="24"/></VBox.margin>
+                </Button>
+                <Button fx:id="botaoFuncionarios" text="Funcionários" styleClass="sidebar-btn"
+                        onAction="#abrirFuncionarios" maxWidth="Infinity"
+                        visible="false" managed="false">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
+                        <image><Image url="@../icons/cliente.png"/></image>
+                    </ImageView></graphic>
                 </Button>
                 <Region VBox.vgrow="ALWAYS"/>
                 <Button text="Sair" styleClass="sidebar-sair" onAction="#handleSair" maxWidth="Infinity"/>

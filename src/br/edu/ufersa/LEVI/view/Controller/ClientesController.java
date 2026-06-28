@@ -28,6 +28,7 @@ public class ClientesController {
     @FXML private TableView<Cliente> tabelaClientes;
     @FXML private TableColumn<Cliente, String> colNome, colCpf, colEndereco, colStatus, colItens, colAcoes;
 
+    @FXML private Button botaoFuncionarios;
     @FXML private StackPane painelFormulario;
     @FXML private Label labelTituloForm;
     @FXML private TextField fieldNome, fieldCpf, fieldEndereco;
@@ -38,6 +39,7 @@ public class ClientesController {
 
     @FXML
     public void initialize() {
+        configurarAcessoPorCargo();
         configurarTabela();
         carregarClientes(facade.listarClientes());
     }
@@ -218,6 +220,10 @@ public class ClientesController {
     @FXML public void abrirClientes()  { /* já estamos aqui */ }
     @FXML public void abrirAlugueis()  { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaAlugueis.fxml", "Duduteca - Aluguéis"); }
     @FXML public void abrirDashboard() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaDashboard.fxml","Duduteca - Dashboard"); }
+    @FXML public void abrirFuncionarios() {
+        if (!SessaoUsuario.isGerente()) return;
+        navegar("/br/edu/ufersa/LEVI/view/fxml/TelaFuncionarios.fxml", "Duduteca - Funcionários");
+    }
     @FXML public void abrirRelatorio() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaRelatorio.fxml","Duduteca - Relatório"); }
     @FXML public void handleSair()     { SessaoUsuario.encerrarSessao(); navegar("/br/edu/ufersa/LEVI/view/fxml/TelaLogin.fxml", "Duduteca - Login"); }
 
@@ -225,4 +231,12 @@ public class ClientesController {
         try { App.trocarTela(fxml, titulo); }
         catch (IOException e) { labelErro.setText("Erro ao navegar: " + e.getMessage()); }
     }
+    private void configurarAcessoPorCargo() {
+        if (botaoFuncionarios != null) {
+            boolean gerente = SessaoUsuario.isGerente();
+            botaoFuncionarios.setVisible(gerente);
+            botaoFuncionarios.setManaged(gerente);
+        }
+    }
+
 }

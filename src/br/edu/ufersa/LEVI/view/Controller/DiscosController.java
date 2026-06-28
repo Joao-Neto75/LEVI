@@ -37,12 +37,14 @@ public class DiscosController {
     @FXML private Label labelTituloForm;
     @FXML private TextField fieldTitulo, fieldBanda, fieldEstilo, fieldAno, fieldExemplares, fieldValor;
     @FXML private Label labelErroForm;
+    @FXML private Button botaoFuncionarios;
 
     private final LocadoraFacade facade = new LocadoraFacade();
     private Disco discoEmEdicao = null;
 
     @FXML
     public void initialize() {
+        configurarAcessoPorCargo();
         configurarTabela();
         carregarEstilos();
         carregarDiscos(facade.listarDiscos());
@@ -187,6 +189,10 @@ public class DiscosController {
     @FXML public void abrirClientes() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaClientes.fxml", "Duduteca - Clientes"); }
     @FXML public void abrirAlugueis() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaAlugueis.fxml", "Duduteca - Aluguéis"); }
     @FXML public void abrirDashboard() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaDashboard.fxml", "Duduteca - Dashboard"); }
+    @FXML public void abrirFuncionarios() {
+        if (!SessaoUsuario.isGerente()) return;
+        navegar("/br/edu/ufersa/LEVI/view/fxml/TelaFuncionarios.fxml", "Duduteca - Funcionários");
+    }
     @FXML public void abrirRelatorio() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaRelatorio.fxml", "Duduteca - Relatório"); }
     @FXML public void handleSair() { SessaoUsuario.encerrarSessao(); navegar("/br/edu/ufersa/LEVI/view/fxml/TelaLogin.fxml", "Duduteca - Login"); }
 
@@ -194,4 +200,12 @@ public class DiscosController {
         try { App.trocarTela(fxml, titulo); }
         catch (IOException e) { labelErro.setText("Tela não implementada: " + fxml); }
     }
+    private void configurarAcessoPorCargo() {
+        if (botaoFuncionarios != null) {
+            boolean gerente = SessaoUsuario.isGerente();
+            botaoFuncionarios.setVisible(gerente);
+            botaoFuncionarios.setManaged(gerente);
+        }
+    }
+
 }

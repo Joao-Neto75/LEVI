@@ -28,6 +28,7 @@ public class AlugueisController {
     @FXML private Label labelValorTotal;
     @FXML private Label labelErroForm;
     @FXML private Label labelErro;
+    @FXML private Button botaoFuncionarios;
 
     // Tabela
     @FXML private TableView<LinhaAluguel> tabelaAlugueis;
@@ -43,6 +44,7 @@ public class AlugueisController {
     @FXML
     public void initialize() {
         configurarCombos();
+        configurarAcessoPorCargo();
         configurarTabela();
         carregarAlugueis();
         configurarListeners();
@@ -218,7 +220,7 @@ public class AlugueisController {
             // Verifica se o aluguel bate com o cliente e título selecionado e ainda está Ativo
             boolean mesmoCliente = a.getCliente() != null && a.getCliente().getNome().equals(selecionada.nomeCliente);
             boolean mesmoProduto = a.getProdutos().stream().anyMatch(p -> p.getDescricao().contains(selecionada.titulo));
-            
+
             if (mesmoCliente && mesmoProduto && !a.getStatus().equals("Finalizado")) {
                 try {
                     facade.finalizarAluguel(a, LocalDate.now());
@@ -248,10 +250,22 @@ public class AlugueisController {
     @FXML public void abrirAlugueis() { /* já estamos aqui */ }
     @FXML public void abrirDashboard() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaDashboard.fxml", "Duduteca - Dashboard"); }
     @FXML public void abrirRelatorio() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaRelatorio.fxml", "Duduteca - Relatório"); }
+    @FXML public void abrirFuncionarios() {
+        if (!SessaoUsuario.isGerente()) return;
+        navegar("/br/edu/ufersa/LEVI/view/fxml/TelaFuncionarios.fxml", "Duduteca - Funcionários");
+    }
     @FXML public void handleSair() { SessaoUsuario.encerrarSessao(); navegar("/br/edu/ufersa/LEVI/view/fxml/TelaLogin.fxml", "Duduteca - Login"); }
 
     private void navegar(String fxml, String titulo) {
         try { App.trocarTela(fxml, titulo); }
         catch (IOException e) { labelErro.setText("Tela não implementada: " + fxml); }
     }
+    private void configurarAcessoPorCargo() {
+        if (botaoFuncionarios != null) {
+            boolean gerente = SessaoUsuario.isGerente();
+            botaoFuncionarios.setVisible(gerente);
+            botaoFuncionarios.setManaged(gerente);
+        }
+    }
+
 }

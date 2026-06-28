@@ -26,6 +26,7 @@ public class DashboardController {
     @FXML private Button botaoClientes;
     @FXML private Button botaoAlugueis;
     @FXML private Button botaoSair;
+    @FXML private Button botaoFuncionarios;  // visível só para Gerente
 
     @FXML private TextField campoBusca;
     @FXML private Label labelFuncionarioLogado;
@@ -45,16 +46,26 @@ public class DashboardController {
     @FXML
     public void initialize() {
         exibirFuncionarioLogado();
+        configurarAcessoPorCargo();
         carregarVisaoGeral();
         carregarMaisBuscados();
         carregarAlugueisExpirando();
         carregarRenovacoes();
     }
 
+    // Mostra nome do funcionário logado e exibe/oculta botão de Funcionários
     private void exibirFuncionarioLogado() {
         Funcionarios logado = SessaoUsuario.getFuncionarioLogado();
         if (logado != null && labelFuncionarioLogado != null) {
-            labelFuncionarioLogado.setText(logado.getNome());
+            labelFuncionarioLogado.setText(logado.getNome() + "\n" + logado.getCargo());
+        }
+    }
+
+    private void configurarAcessoPorCargo() {
+        boolean gerente = SessaoUsuario.isGerente();
+        if (botaoFuncionarios != null) {
+            botaoFuncionarios.setVisible(gerente);
+            botaoFuncionarios.setManaged(gerente);
         }
     }
 
@@ -74,7 +85,8 @@ public class DashboardController {
                 .count();
         labelAlugueisAtivos.setText("Aluguéis Ativos: " + alugueisAtivos);
 
-        labelVisaoGeralTitulo.setText("Visão Geral (" + mesEmPortugues(hoje.getMonthValue()) + "/" + hoje.getYear() + ")");
+        labelVisaoGeralTitulo.setText("Visão Geral ("
+                + mesEmPortugues(hoje.getMonthValue()) + "/" + hoje.getYear() + ")");
     }
 
     private void carregarMaisBuscados() {
@@ -96,27 +108,22 @@ public class DashboardController {
 
     private void carregarAlugueisExpirando() {
         List<String> itens = new ArrayList<>();
-        LocalDate hoje = LocalDate.now();
+        LocalDate hoje  = LocalDate.now();
         LocalDate limite = hoje.plusDays(7);
 
         for (Aluguel a : facade.listarAlugueis()) {
             if (!"Ativo".equals(a.getStatus())) continue;
 
-            // Usa dataPrevistaDevolucao se disponível, senão cai para dataDevolucao
             LocalDate dataRef = a.getDataPrevistaDevolucao() != null
-                    ? a.getDataPrevistaDevolucao()
-                    : a.getDataDevolucao();
-
+                    ? a.getDataPrevistaDevolucao() : a.getDataDevolucao();
             if (dataRef == null) continue;
 
             String nomeCliente = a.getCliente() != null ? a.getCliente().getNome() : "—";
 
             if (dataRef.isBefore(hoje)) {
-                // Atrasado
                 long dias = java.time.temporal.ChronoUnit.DAYS.between(dataRef, hoje);
                 itens.add("🔴 " + nomeCliente + " — " + dias + " dia(s) em atraso");
             } else if (!dataRef.isAfter(limite)) {
-                // Vence nos próximos 7 dias
                 if (dataRef.isEqual(hoje)) {
                     itens.add("⚠ " + nomeCliente + " — vence hoje (" + dataRef.format(FMT) + ")");
                 } else {
@@ -138,17 +145,14 @@ public class DashboardController {
             if (!"Ativo".equals(a.getStatus())) continue;
             if (a.getDataPrevistaDevolucao() == null) continue;
 
-            // Renovação automática: aluguel que vence em até 2 dias e ainda não foi renovado
             long diasParaVencer = java.time.temporal.ChronoUnit.DAYS
                     .between(hoje, a.getDataPrevistaDevolucao());
 
             if (diasParaVencer >= 0 && diasParaVencer <= 2 && !a.isRenovado()) {
                 String nomeCliente = a.getCliente() != null ? a.getCliente().getNome() : "—";
                 LocalDate novaData = a.getDataPrevistaDevolucao().plusDays(7);
-
                 String produto = a.getProdutos().isEmpty() ? "item"
                         : a.getProdutos().get(0).getTitulo();
-
                 itens.add("🔄 " + nomeCliente + " — \"" + produto
                         + "\" → Nova data: " + novaData.format(FMT));
             }
@@ -159,18 +163,25 @@ public class DashboardController {
     }
 
     private String mesEmPortugues(int mes) {
-        String[] meses = {"Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
-                "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"};
+        String[] meses = {"Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+                "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"};
         return meses[mes - 1];
     }
 
-    @FXML public void abrirLivros()    { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaLivros.fxml",    "Duduteca - Livros"); }
-    @FXML public void abrirDiscos()    { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaDiscos.fxml",    "Duduteca - Discos"); }
-    @FXML public void abrirClientes()  { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaClientes.fxml",  "Duduteca - Clientes"); }
-    @FXML public void abrirAlugueis()  { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaAlugueis.fxml",  "Duduteca - Aluguéis"); }
-    @FXML public void abrirRelatorio() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaRelatorio.fxml", "Duduteca - Relatório"); }
-    @FXML public void abrirDashboard() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaDashboard.fxml", "Duduteca - Dashboard"); }
-    @FXML public void handleSair()     { SessaoUsuario.encerrarSessao(); navegar("/br/edu/ufersa/LEVI/view/fxml/TelaLogin.fxml", "Duduteca - Login"); }
+    @FXML public void abrirLivros()       { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaLivros.fxml",        "Duduteca - Livros"); }
+    @FXML public void abrirDiscos()       { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaDiscos.fxml",        "Duduteca - Discos"); }
+    @FXML public void abrirClientes()     { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaClientes.fxml",      "Duduteca - Clientes"); }
+    @FXML public void abrirAlugueis()     { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaAlugueis.fxml",      "Duduteca - Aluguéis"); }
+    @FXML public void abrirRelatorio()    { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaRelatorio.fxml",     "Duduteca - Relatório"); }
+    @FXML public void abrirDashboard()    { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaDashboard.fxml",     "Duduteca - Dashboard"); }
+    @FXML public void abrirFuncionarios() {
+        if (!SessaoUsuario.isGerente()) return; // proteção extra
+        navegar("/br/edu/ufersa/LEVI/view/fxml/TelaFuncionarios.fxml", "Duduteca - Funcionários");
+    }
+    @FXML public void handleSair() {
+        SessaoUsuario.encerrarSessao();
+        navegar("/br/edu/ufersa/LEVI/view/fxml/TelaLogin.fxml", "Duduteca - Login");
+    }
 
     private void navegar(String fxml, String titulo) {
         try { App.trocarTela(fxml, titulo); }

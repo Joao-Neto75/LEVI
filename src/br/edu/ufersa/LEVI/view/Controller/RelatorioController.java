@@ -100,6 +100,7 @@ public class RelatorioController {
             cursor = cursor.minusMonths(1);
         }
 
+        configurarAcessoPorCargo();
         comboMesAno.setItems(opcoes);
         comboMesAno.getSelectionModel().selectFirst();
     }
@@ -324,6 +325,8 @@ public class RelatorioController {
         trocarTelaComTratamento("/br/edu/ufersa/LEVI/view/fxml/TelaAlugueis.fxml", "Duduteca - Aluguéis");
     }
 
+    @FXML private Button botaoFuncionarios;
+
     @FXML
     public void abrirRelatorio() {
         // já estamos na tela de relatório; não faz nada
@@ -332,6 +335,12 @@ public class RelatorioController {
     @FXML
     public void abrirDashboard() {
         trocarTelaComTratamento("/br/edu/ufersa/LEVI/view/fxml/TelaDashboard.fxml", "Duduteca - Dashboard");
+    }
+
+    @FXML
+    public void abrirFuncionarios() {
+        if (!SessaoUsuario.isGerente()) return;
+        trocarTelaComTratamento("/br/edu/ufersa/LEVI/view/fxml/TelaFuncionarios.fxml", "Duduteca - Funcionários");
     }
 
     @FXML
@@ -347,4 +356,12 @@ public class RelatorioController {
             labelErro.setText("Tela ainda não implementada: " + caminhoFxml);
         }
     }
+    private void configurarAcessoPorCargo() {
+        if (botaoFuncionarios != null) {
+            boolean gerente = SessaoUsuario.isGerente();
+            botaoFuncionarios.setVisible(gerente);
+            botaoFuncionarios.setManaged(gerente);
+        }
+    }
+
 }

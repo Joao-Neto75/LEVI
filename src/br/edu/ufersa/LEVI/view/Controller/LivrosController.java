@@ -51,6 +51,7 @@ public class LivrosController {
     @FXML private TextField fieldExemplares;
     @FXML private TextField fieldValor;
     @FXML private Label labelErroForm;
+    @FXML private Button botaoFuncionarios;
 
     private final LocadoraFacade facade = new LocadoraFacade();
     private Livro livroEmEdicao = null;
@@ -59,6 +60,7 @@ public class LivrosController {
     public void initialize() {
         configurarTabela();
         carregarGeneros();
+        configurarAcessoPorCargo();
         carregarLivros(facade.listarLivros());
     }
 
@@ -225,6 +227,10 @@ public class LivrosController {
     @FXML public void abrirClientes() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaClientes.fxml", "Duduteca - Clientes"); }
     @FXML public void abrirAlugueis() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaAlugueis.fxml", "Duduteca - Aluguéis"); }
     @FXML public void abrirDashboard() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaDashboard.fxml", "Duduteca - Dashboard"); }
+    @FXML public void abrirFuncionarios() {
+        if (!SessaoUsuario.isGerente()) return;
+        navegar("/br/edu/ufersa/LEVI/view/fxml/TelaFuncionarios.fxml", "Duduteca - Funcionários");
+    }
     @FXML public void abrirRelatorio() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaRelatorio.fxml", "Duduteca - Relatório"); }
     @FXML public void handleSair() {
         SessaoUsuario.encerrarSessao();
@@ -235,4 +241,12 @@ public class LivrosController {
         try { App.trocarTela(fxml, titulo); }
         catch (IOException e) { labelErro.setText("Tela não implementada: " + fxml); }
     }
+    private void configurarAcessoPorCargo() {
+        if (botaoFuncionarios != null) {
+            boolean gerente = SessaoUsuario.isGerente();
+            botaoFuncionarios.setVisible(gerente);
+            botaoFuncionarios.setManaged(gerente);
+        }
+    }
+
 }
