@@ -1,162 +1,153 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<?import javafx.geometry.*?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefHeight="650.0" prefWidth="1000.0" style="-fx-background-color: #F4E9DD; -fx-font-family: 'Segoe UI', Arial, sans-serif;"
-            xmlns="http://javafx.com/javafx/8"
+<BorderPane prefHeight="650.0" prefWidth="1000.0"
+            stylesheets="@../css/duduteca.css"
+            xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="br.edu.ufersa.LEVI.view.Controller.DashboardController">
 
-    <!-- SIDEBAR -->
     <left>
-        <VBox prefWidth="220.0" spacing="8.0" style="-fx-background-color: #D4A537;">
-            <padding><Insets bottom="30" left="20" right="20" top="30"/></padding>
+        <VBox styleClass="sidebar" spacing="0">
+            <padding><Insets top="30" right="20" bottom="30" left="24"/></padding>
             <children>
-                <Button onAction="#abrirDashboard" maxWidth="Infinity" alignment="CENTER_LEFT"
-                        style="-fx-background-color: transparent; -fx-font-size: 20px; -fx-font-weight: bold; -fx-text-fill: #1E1E1E; -fx-cursor: hand; -fx-padding: 0;"
-                        text="DUDUTECA">
-                    <VBox.margin><Insets bottom="24"/></VBox.margin>
+                <Button onAction="#abrirDashboard" styleClass="sidebar-btn"
+                        style="-fx-padding: 0; -fx-background-color: transparent;">
+                    <graphic><Label text="DUDUTECA" styleClass="sidebar-title"/></graphic>
+                    <VBox.margin><Insets bottom="36"/></VBox.margin>
                 </Button>
-
-                <Button fx:id="botaoLivros" alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity"
-                        onAction="#abrirLivros"
-                        style="-fx-background-color: transparent; -fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1E1E1E; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 10 12 10 12;"
-                        text="Livros">
-                    <graphic><ImageView fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                <Button text="Livros" styleClass="sidebar-btn" onAction="#abrirLivros" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
                         <image><Image url="@../icons/livro.png"/></image>
                     </ImageView></graphic>
+                    <VBox.margin><Insets bottom="24"/></VBox.margin>
                 </Button>
-
-                <Button fx:id="botaoDiscos" alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity"
-                        onAction="#abrirDiscos"
-                        style="-fx-background-color: transparent; -fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1E1E1E; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 10 12 10 12;"
-                        text="Discos">
-                    <graphic><ImageView fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                <Button text="Discos" styleClass="sidebar-btn" onAction="#abrirDiscos" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
                         <image><Image url="@../icons/disco.png"/></image>
                     </ImageView></graphic>
+                    <VBox.margin><Insets bottom="24"/></VBox.margin>
                 </Button>
-
-                <Button fx:id="botaoClientes" alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity"
-                        onAction="#abrirClientes"
-                        style="-fx-background-color: transparent; -fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1E1E1E; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 10 12 10 12;"
-                        text="Clientes">
-                    <graphic><ImageView fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                <Button text="Clientes" styleClass="sidebar-btn" onAction="#abrirClientes" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
                         <image><Image url="@../icons/cliente.png"/></image>
                     </ImageView></graphic>
+                    <VBox.margin><Insets bottom="24"/></VBox.margin>
                 </Button>
-
-                <Button fx:id="botaoAlugueis" alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity"
-                        onAction="#abrirAlugueis"
-                        style="-fx-background-color: transparent; -fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1E1E1E; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 10 12 10 12;"
-                        text="Alugueis">
-                    <graphic><ImageView fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                <Button text="Alugueis" styleClass="sidebar-btn" onAction="#abrirAlugueis" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
                         <image><Image url="@../icons/aluguel.png"/></image>
                     </ImageView></graphic>
+                    <VBox.margin><Insets bottom="24"/></VBox.margin>
                 </Button>
-
-                <Button fx:id="botaoRelatorio" alignment="CENTER_LEFT" graphicTextGap="12.0" maxWidth="Infinity"
-                        onAction="#abrirRelatorio"
-                        style="-fx-background-color: transparent; -fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1E1E1E; -fx-cursor: hand; -fx-background-radius: 8; -fx-padding: 10 12 10 12;"
-                        text="Relatório">
-                    <graphic><ImageView fitHeight="24.0" fitWidth="24.0" preserveRatio="true">
+                <Button text="Relatório" styleClass="sidebar-btn" onAction="#abrirRelatorio" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
                         <image><Image url="@../icons/relatorio.png"/></image>
                     </ImageView></graphic>
                 </Button>
-
-                <VBox VBox.vgrow="ALWAYS"/>
-
-                <HBox alignment="CENTER_LEFT" spacing="8.0">
-                    <children>
-                        <Label fx:id="labelFuncionarioLogado" style="-fx-font-size: 12px; -fx-font-style: italic; -fx-text-fill: #1E1E1E;" wrapText="true"/>
-                    </children>
-                </HBox>
-
-                <Button fx:id="botaoSair" alignment="CENTER_LEFT" maxWidth="Infinity"
-                        onAction="#handleSair"
-                        style="-fx-background-color: transparent; -fx-font-size: 13px; -fx-text-fill: #1E1E1E; -fx-cursor: hand; -fx-padding: 10 12 10 12;"
-                        text="Sair"/>
+                <Region VBox.vgrow="ALWAYS"/>
+                <Label fx:id="labelFuncionarioLogado"
+                       style="-fx-font-size: 12px; -fx-font-style: italic; -fx-text-fill: #1E1E1E; -fx-wrap-text: true;">
+                    <VBox.margin><Insets bottom="8"/></VBox.margin>
+                </Label>
+                <Button text="Sair" styleClass="sidebar-sair" onAction="#handleSair" maxWidth="Infinity"/>
             </children>
         </VBox>
     </left>
 
-    <!-- CARDS -->
     <center>
-        <GridPane hgap="16.0" vgap="16.0">
-            <padding><Insets bottom="30" left="30" right="30" top="30"/></padding>
-            <columnConstraints>
-                <ColumnConstraints percentWidth="50"/>
-                <ColumnConstraints percentWidth="50"/>
-            </columnConstraints>
-            <rowConstraints>
-                <RowConstraints percentHeight="50"/>
-                <RowConstraints percentHeight="50"/>
-            </rowConstraints>
+        <VBox spacing="16.0">
+            <padding><Insets top="30" right="35" bottom="30" left="35"/></padding>
             <children>
-
-                <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);"
-                      GridPane.columnIndex="0" GridPane.rowIndex="0">
-                    <padding><Insets bottom="15" left="18" right="18" top="15"/></padding>
+                <GridPane hgap="16.0" vgap="16.0" VBox.vgrow="ALWAYS">
+                    <columnConstraints>
+                        <ColumnConstraints percentWidth="50"/>
+                        <ColumnConstraints percentWidth="50"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints percentHeight="50"/>
+                        <RowConstraints percentHeight="50"/>
+                    </rowConstraints>
                     <children>
-                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                        <VBox spacing="10" styleClass="card-white"
+                              GridPane.columnIndex="0" GridPane.rowIndex="0">
+                            <padding><Insets top="18" right="18" bottom="18" left="18"/></padding>
                             <children>
-                                <ImageView fitHeight="20.0" fitWidth="20.0" preserveRatio="true">
-                                    <image><Image url="@../icons/livro.png"/></image>
-                                </ImageView>
-                                <Label style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1E1E1E;" text="Mais buscados"/>
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <children>
+                                        <ImageView fitWidth="20" fitHeight="20" preserveRatio="true">
+                                            <image><Image url="@../icons/livro.png"/></image>
+                                        </ImageView>
+                                        <Label text="Mais buscados" style="-fx-font-size: 15px; -fx-font-weight: bold;"/>
+                                    </children>
+                                </HBox>
+                                <ListView fx:id="listaMaisBuscados"
+                                          style="-fx-background-color: transparent; -fx-font-size: 13px;"
+                                          VBox.vgrow="ALWAYS"/>
                             </children>
-                        </HBox>
-                        <ListView fx:id="listaMaisBuscados" style="-fx-background-color: transparent; -fx-font-size: 13px;" VBox.vgrow="ALWAYS"/>
-                    </children>
-                </VBox>
+                        </VBox>
 
-                <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);"
-                      GridPane.columnIndex="1" GridPane.rowIndex="0">
-                    <padding><Insets bottom="15" left="18" right="18" top="15"/></padding>
-                    <children>
-                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                        <VBox spacing="10" styleClass="card-white"
+                              GridPane.columnIndex="1" GridPane.rowIndex="0">
+                            <padding><Insets top="18" right="18" bottom="18" left="18"/></padding>
                             <children>
-                                <ImageView fitHeight="20.0" fitWidth="20.0" preserveRatio="true">
-                                    <image><Image url="@../icons/aluguel.png"/></image>
-                                </ImageView>
-                                <Label style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1E1E1E;" text="Alugueis expirando"/>
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <children>
+                                        <ImageView fitWidth="20" fitHeight="20" preserveRatio="true">
+                                            <image><Image url="@../icons/aluguel.png"/></image>
+                                        </ImageView>
+                                        <Label text="Alugueis expirando" style="-fx-font-size: 15px; -fx-font-weight: bold;"/>
+                                    </children>
+                                </HBox>
+                                <ListView fx:id="listaAlugueisExpirando"
+                                          style="-fx-background-color: transparent; -fx-font-size: 13px;"
+                                          VBox.vgrow="ALWAYS"/>
                             </children>
-                        </HBox>
-                        <ListView fx:id="listaAlugueisExpirando" style="-fx-background-color: transparent; -fx-font-size: 13px;" VBox.vgrow="ALWAYS"/>
-                    </children>
-                </VBox>
+                        </VBox>
 
-                <VBox spacing="10.0" style="-fx-background-color: white; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);"
-                      GridPane.columnIndex="0" GridPane.rowIndex="1">
-                    <padding><Insets bottom="15" left="18" right="18" top="15"/></padding>
-                    <children>
-                        <HBox alignment="CENTER_LEFT" spacing="8.0">
+                        <VBox spacing="10" styleClass="card-white"
+                              GridPane.columnIndex="0" GridPane.rowIndex="1">
+                            <padding><Insets top="18" right="18" bottom="18" left="18"/></padding>
                             <children>
-                                <ImageView fitHeight="20.0" fitWidth="20.0" preserveRatio="true">
-                                    <image><Image url="@../icons/relatorio.png"/></image>
-                                </ImageView>
-                                <Label style="-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1E1E1E;" text="Renovações automáticas"/>
+                                <HBox alignment="CENTER_LEFT" spacing="10">
+                                    <children>
+                                        <ImageView fitWidth="20" fitHeight="20" preserveRatio="true">
+                                            <image><Image url="@../icons/relatorio.png"/></image>
+                                        </ImageView>
+                                        <Label text="Renovações automáticas" style="-fx-font-size: 15px; -fx-font-weight: bold;"/>
+                                    </children>
+                                </HBox>
+                                <ListView fx:id="listaRenovacoes"
+                                          style="-fx-background-color: transparent; -fx-font-size: 13px;"
+                                          VBox.vgrow="ALWAYS"/>
                             </children>
-                        </HBox>
-                        <ListView fx:id="listaRenovacoes" style="-fx-background-color: transparent; -fx-font-size: 13px;" VBox.vgrow="ALWAYS"/>
-                    </children>
-                </VBox>
+                        </VBox>
 
-                <VBox spacing="12.0" style="-fx-background-color: #D4A537; -fx-background-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 8, 0, 0, 2);"
-                      GridPane.columnIndex="1" GridPane.rowIndex="1">
-                    <padding><Insets bottom="20" left="20" right="20" top="20"/></padding>
-                    <children>
-                        <Label fx:id="labelVisaoGeralTitulo" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1E1E1E;" text="Visão Geral"/>
-                        <Label fx:id="labelFaturamento" style="-fx-font-size: 14px; -fx-text-fill: #1E1E1E;" text="Faturamento Total: R$ 0,00"/>
-                        <Label fx:id="labelAlugueisAtivos" style="-fx-font-size: 14px; -fx-text-fill: #1E1E1E;" text="Aluguéis Ativos: 0"/>
-                        <Label fx:id="labelEstoque" style="-fx-font-size: 14px; -fx-text-fill: #1E1E1E;" text="Total em Estoque: 0"/>
+                        <VBox spacing="14"
+                              style="-fx-background-color: #D4A537; -fx-background-radius: 12;"
+                              GridPane.columnIndex="1" GridPane.rowIndex="1">
+                            <padding><Insets top="18" right="18" bottom="18" left="18"/></padding>
+                            <children>
+                                <Label fx:id="labelVisaoGeralTitulo"
+                                       style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1E1E1E;"
+                                       text="Visão Geral"/>
+                                <Label fx:id="labelFaturamento"
+                                       style="-fx-font-size: 14px; -fx-text-fill: #1E1E1E;"
+                                       text="Faturamento Total: R$ 0,00"/>
+                                <Label fx:id="labelAlugueisAtivos"
+                                       style="-fx-font-size: 14px; -fx-text-fill: #1E1E1E;"
+                                       text="Aluguéis Ativos: 0"/>
+                                <Label fx:id="labelEstoque"
+                                       style="-fx-font-size: 14px; -fx-text-fill: #1E1E1E;"
+                                       text="Total em Estoque: 0"/>
+                            </children>
+                        </VBox>
                     </children>
-                </VBox>
-
+                </GridPane>
             </children>
-        </GridPane>
+        </VBox>
     </center>
-
 </BorderPane>
