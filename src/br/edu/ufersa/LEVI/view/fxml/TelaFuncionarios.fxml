@@ -129,6 +129,8 @@
                         <TextField fx:id="fieldNome" promptText="Nome completo" styleClass="search-field"/>
                         <Label text="Cargo" style="-fx-font-size:12px;"/>
                         <ComboBox fx:id="comboCargo" promptText="Cargo" maxWidth="Infinity"/>
+                        <Label text="Salário (R$)" style="-fx-font-size:12px;"/>
+                        <TextField fx:id="fieldSalario" promptText="Ex: 1500.00" styleClass="search-field"/>
                         <Label text="E-mail" style="-fx-font-size:12px;"/>
                         <TextField fx:id="fieldEmail" promptText="E-mail" styleClass="search-field"/>
                         <Label text="Senha" style="-fx-font-size:12px;"/>

@@ -25,7 +25,7 @@ public class FuncionariosController {
 
     @FXML private StackPane painelFormulario;
     @FXML private Label labelTituloForm, labelErroForm;
-    @FXML private TextField fieldNome, fieldEmail;
+    @FXML private TextField fieldNome, fieldEmail, fieldSalario;
     @FXML private PasswordField fieldSenha, fieldConfirma;
     @FXML private ComboBox<String> comboCargo;
 
@@ -124,7 +124,7 @@ public class FuncionariosController {
     public void handleAdicionar() {
         funcionarioEmEdicao = null;
         labelTituloForm.setText("Novo Funcionário");
-        fieldNome.clear(); fieldEmail.clear();
+        fieldNome.clear(); fieldEmail.clear(); fieldSalario.clear();
         fieldSenha.clear(); fieldConfirma.clear();
         comboCargo.setValue(null);
         fieldSenha.setPromptText("Senha");
@@ -140,6 +140,7 @@ public class FuncionariosController {
         fieldNome.setText(f.getNome());
         fieldEmail.setText(f.getEmail());
         comboCargo.setValue(f.getCargo());
+        fieldSalario.setText(String.valueOf(f.getSalario()));
         // Na edição, senha em branco = não alterar
         fieldSenha.clear();
         fieldConfirma.clear();
@@ -163,6 +164,22 @@ public class FuncionariosController {
                 return;
             }
 
+            // Validar salário
+            double salario = 0;
+            String salarioStr = fieldSalario.getText().trim().replace(",", ".");
+            if (!salarioStr.isEmpty()) {
+                try {
+                    salario = Double.parseDouble(salarioStr);
+                    if (salario < 0) {
+                        labelErroForm.setText("Salário não pode ser negativo.");
+                        return;
+                    }
+                } catch (NumberFormatException ex) {
+                    labelErroForm.setText("Salário inválido. Use apenas números (ex: 1500.00).");
+                    return;
+                }
+            }
+
             if (funcionarioEmEdicao == null) {
                 // Novo: senha obrigatória
                 if (senha.isEmpty()) {
@@ -173,13 +190,14 @@ public class FuncionariosController {
                     labelErroForm.setText("As senhas não coincidem.");
                     return;
                 }
-                Funcionarios novo = new Funcionarios(nome, cargo, 0, new Date(), email, senha);
+                Funcionarios novo = new Funcionarios(nome, cargo, salario, new Date(), email, senha);
                 facade.cadastrarFuncionario(novo);
             } else {
                 // Edição
                 funcionarioEmEdicao.setNome(nome);
                 funcionarioEmEdicao.setEmail(email);
                 funcionarioEmEdicao.setCargo(cargo);
+                funcionarioEmEdicao.setSalario(salario);
                 if (!senha.isEmpty()) {
                     if (!senha.equals(confirma)) {
                         labelErroForm.setText("As senhas não coincidem.");
