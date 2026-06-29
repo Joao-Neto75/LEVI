@@ -4,7 +4,7 @@
 <?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefHeight="650.0" prefWidth="1000.0"
+<BorderPane prefHeight="700.0" prefWidth="1100.0"
             stylesheets="@../css/duduteca.css"
             xmlns="http://javafx.com/javafx/17"
             xmlns:fx="http://javafx.com/fxml/1"
@@ -63,45 +63,127 @@
     </left>
 
     <center>
-        <VBox spacing="16.0">
-            <padding><Insets top="30" right="35" bottom="30" left="35"/></padding>
+        <VBox spacing="14.0" maxHeight="Infinity" maxWidth="Infinity">
+            <padding><Insets top="24" right="30" bottom="24" left="30"/></padding>
             <children>
+
                 <Label text="Gerenciamento de Alugueis" styleClass="page-title"/>
 
-                <VBox spacing="12" style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #E0D5C8; -fx-border-radius: 10;">
-                    <padding><Insets top="16" right="20" bottom="16" left="20"/></padding>
+                <!-- Card Novo Aluguel -->
+                <VBox spacing="10"
+                      style="-fx-background-color: white; -fx-background-radius: 10;
+                             -fx-border-color: #E0D5C8; -fx-border-radius: 10;
+                             -fx-effect: dropshadow(gaussian,rgba(0,0,0,0.06),6,0,0,2);">
+                    <padding><Insets top="14" right="18" bottom="14" left="18"/></padding>
                     <children>
-                        <Label text="Novo Aluguel" style="-fx-font-size:16px; -fx-font-weight:bold;"/>
-                        <HBox spacing="16" alignment="CENTER_LEFT">
+                        <Label text="Novo Aluguel" style="-fx-font-size:15px; -fx-font-weight:bold;"/>
+
+                        <!-- Linha 1: Cliente + Datas + Valor + Registrar -->
+                        <HBox spacing="14" alignment="CENTER_LEFT">
                             <children>
-                                <VBox spacing="4"><children><Label text="Cliente" style="-fx-font-size:12px;"/><ComboBox fx:id="comboCliente" prefWidth="160"/></children></VBox>
-                                <VBox spacing="4"><children><Label text="Livro" style="-fx-font-size:12px;"/><ComboBox fx:id="comboLivro" prefWidth="180"/></children></VBox>
-                                <VBox spacing="4"><children><Label text="Disco" style="-fx-font-size:12px;"/><ComboBox fx:id="comboDisco" prefWidth="180"/></children></VBox>
-                                <VBox spacing="4"><children><Label text="Data Início" style="-fx-font-size:12px;"/><DatePicker fx:id="dataEmprestimo" prefWidth="130"/></children></VBox>
-                                <VBox spacing="4"><children><Label text="Data Devolução" style="-fx-font-size:12px;"/><DatePicker fx:id="dataDevolucao" prefWidth="130"/></children></VBox>
-                                <VBox spacing="4"><children><Label text="Valor Total" style="-fx-font-size:12px;"/><Label fx:id="labelValorTotal" text="R$ 0,00" style="-fx-font-size:15px; -fx-font-weight:bold;"/></children></VBox>
+                                <VBox spacing="3" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <Label text="CLIENTE" style="-fx-font-size:11px; -fx-text-fill:#D4A537; -fx-font-weight:bold;"/>
+                                        <ComboBox fx:id="comboCliente" maxWidth="Infinity"
+                                                  style="-fx-border-color:#D4A537; -fx-border-radius:4;"/>
+                                    </children>
+                                </VBox>
+                                <VBox spacing="3">
+                                    <children>
+                                        <Label text="DATA INÍCIO" style="-fx-font-size:11px; -fx-text-fill:#D4A537; -fx-font-weight:bold;"/>
+                                        <DatePicker fx:id="dataEmprestimo" prefWidth="140"/>
+                                    </children>
+                                </VBox>
+                                <VBox spacing="3">
+                                    <children>
+                                        <Label text="DATA DEVOLUÇÃO" style="-fx-font-size:11px; -fx-text-fill:#D4A537; -fx-font-weight:bold;"/>
+                                        <DatePicker fx:id="dataDevolucao" prefWidth="140"/>
+                                    </children>
+                                </VBox>
+                                <VBox spacing="3">
+                                    <children>
+                                        <Label text="VALOR TOTAL" style="-fx-font-size:11px; -fx-text-fill:#D4A537; -fx-font-weight:bold;"/>
+                                        <Label fx:id="labelValorTotal" text="R$ 0,00"
+                                               style="-fx-font-size:16px; -fx-font-weight:bold;"/>
+                                    </children>
+                                </VBox>
                                 <Region HBox.hgrow="ALWAYS"/>
-                                <Button text="Registrar Aluguel" styleClass="btn-primary" onAction="#handleNovoAluguel"/>
+                                <Button text="✔  Registrar Aluguel" styleClass="btn-primary"
+                                        onAction="#handleNovoAluguel"
+                                        style="-fx-font-size:13px; -fx-padding: 9 18 9 18;">
+                                    <VBox.margin><Insets top="14"/></VBox.margin>
+                                </Button>
                             </children>
                         </HBox>
-                        <Label fx:id="labelErroForm" styleClass="error-label"/>
+
+                        <Separator/>
+
+                        <!-- Linha 2: Seletor de itens -->
+                        <HBox spacing="14" alignment="CENTER_LEFT">
+                            <children>
+                                <VBox spacing="3" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <Label text="LIVRO" style="-fx-font-size:11px; -fx-text-fill:#D4A537; -fx-font-weight:bold;"/>
+                                        <ComboBox fx:id="comboLivro" maxWidth="Infinity"
+                                                  style="-fx-border-color:#D4A537; -fx-border-radius:4;"/>
+                                    </children>
+                                </VBox>
+                                <VBox spacing="3" HBox.hgrow="ALWAYS">
+                                    <children>
+                                        <Label text="DISCO" style="-fx-font-size:11px; -fx-text-fill:#D4A537; -fx-font-weight:bold;"/>
+                                        <ComboBox fx:id="comboDisco" maxWidth="Infinity"
+                                                  style="-fx-border-color:#D4A537; -fx-border-radius:4;"/>
+                                    </children>
+                                </VBox>
+                                <Button text="＋  Adicionar à lista" styleClass="btn-secondary"
+                                        onAction="#handleAdicionarItem"
+                                        style="-fx-font-size:13px; -fx-padding: 9 16 9 16;">
+                                    <VBox.margin><Insets top="14"/></VBox.margin>
+                                </Button>
+                                <Button text="✖  Limpar lista" onAction="#handleLimparLista"
+                                        style="-fx-background-color: #eee; -fx-background-radius:7;
+                                               -fx-font-size:12px; -fx-padding: 9 12 9 12; -fx-cursor:hand;">
+                                    <VBox.margin><Insets top="14"/></VBox.margin>
+                                </Button>
+                            </children>
+                        </HBox>
+
+                        <!-- Lista de itens selecionados -->
+                        <VBox fx:id="boxItensSelecionados" spacing="0" managed="false" visible="false"
+                              style="-fx-background-color:#fafafa; -fx-border-color:#eee;
+                                     -fx-border-radius:6; -fx-background-radius:6;">
+                            <padding><Insets top="6" right="10" bottom="4" left="10"/></padding>
+                            <children>
+                                <Label text="Itens a alugar:"
+                                       style="-fx-font-size:11px; -fx-text-fill:#888; -fx-font-weight:bold;"/>
+                                <ListView fx:id="listaItensSelecionados" prefHeight="90"
+                                          style="-fx-border-color:transparent; -fx-background-color:transparent;"/>
+                            </children>
+                        </VBox>
+
+                        <Label fx:id="labelErroForm" style="-fx-text-fill:red; -fx-font-size:12px;"/>
                     </children>
                 </VBox>
 
-                <HBox alignment="CENTER_RIGHT" spacing="10">
+                <!-- Cabeçalho tabela -->
+                <HBox spacing="12" alignment="CENTER_LEFT">
                     <children>
-                        <Label fx:id="labelErro" styleClass="error-label" HBox.hgrow="ALWAYS"/>
-                        <Button text="Registrar Devolução (item selecionado)" styleClass="search-btn" onAction="#handleDevolucao"/>
+                        <Label text="Alugueis em Andamento"
+                               style="-fx-font-size:15px; -fx-font-weight:bold;"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label fx:id="labelErro" style="-fx-text-fill:red; -fx-font-size:12px;"/>
+                        <Button text="Registrar Devolução  ↩" styleClass="btn-dark"
+                                onAction="#handleDevolucao"/>
                     </children>
                 </HBox>
 
-                <Label text="Alugueis em Andamento" style="-fx-font-size:15px; -fx-font-weight:bold;"/>
-
-                <TableView fx:id="tabelaAlugueis" VBox.vgrow="ALWAYS" maxHeight="Infinity" maxWidth="Infinity" styleClass="table-view">
+                <!-- Tabela de alugueis -->
+                <TableView fx:id="tabelaAlugueis" VBox.vgrow="ALWAYS"
+                           maxHeight="Infinity" maxWidth="Infinity" styleClass="table-view">
                     <columns>
                         <TableColumn fx:id="colCliente" text="Cliente"     prefWidth="160" minWidth="110"/>
                         <TableColumn fx:id="colTipo"    text="Livro/Disco" prefWidth="90"  minWidth="70"/>
-                        <TableColumn fx:id="colTitulo"  text="Título"      prefWidth="200" minWidth="120"/>
+                        <TableColumn fx:id="colTitulo"  text="Título"      prefWidth="220" minWidth="130"/>
                         <TableColumn fx:id="colDatas"   text="Datas"       prefWidth="170" minWidth="120"/>
                         <TableColumn fx:id="colStatus"  text="Status"      prefWidth="140" minWidth="100"/>
                     </columns>
@@ -109,6 +191,7 @@
                         <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
                     </columnResizePolicy>
                 </TableView>
+
             </children>
         </VBox>
     </center>

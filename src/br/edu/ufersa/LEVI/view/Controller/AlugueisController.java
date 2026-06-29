@@ -1,35 +1,37 @@
 package br.edu.ufersa.LEVI.view.Controller;
 
 import br.edu.ufersa.LEVI.App;
-import br.edu.ufersa.LEVI.model.entity.Aluguel;
-import br.edu.ufersa.LEVI.model.entity.Cliente;
-import br.edu.ufersa.LEVI.model.entity.Disco;
-import br.edu.ufersa.LEVI.model.entity.Livro;
-import br.edu.ufersa.LEVI.model.entity.Produto;
+import br.edu.ufersa.LEVI.model.entity.*;
 import br.edu.ufersa.LEVI.model.exception.ProdutoIndisponivelException;
 import br.edu.ufersa.LEVI.model.service.LocadoraFacade;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AlugueisController {
 
-    // Formulário novo aluguel
+    // Formulário
     @FXML private ComboBox<Cliente> comboCliente;
-    @FXML private ComboBox<Livro> comboLivro;
-    @FXML private ComboBox<Disco> comboDisco;
+    @FXML private ComboBox<Livro>   comboLivro;
+    @FXML private ComboBox<Disco>   comboDisco;
     @FXML private DatePicker dataEmprestimo;
     @FXML private DatePicker dataDevolucao;
     @FXML private Label labelValorTotal;
     @FXML private Label labelErroForm;
     @FXML private Label labelErro;
-    @FXML private Button botaoFuncionarios;
+
+    // Lista de itens selecionados
+    @FXML private VBox               boxItensSelecionados;
+    @FXML private ListView<String>   listaItensSelecionados;
 
     // Tabela
     @FXML private TableView<LinhaAluguel> tabelaAlugueis;
@@ -39,8 +41,15 @@ public class AlugueisController {
     @FXML private TableColumn<LinhaAluguel, String> colDatas;
     @FXML private TableColumn<LinhaAluguel, String> colStatus;
 
+    // Sidebar
+    @FXML private Button botaoFuncionarios;
+
     private final LocadoraFacade facade = new LocadoraFacade();
     private static final DateTimeFormatter FMT = DateTimeFormatter.ofPattern("dd/MM/yy");
+
+    // Lista temporária de produtos que serão incluídos no aluguel
+    private final List<Produto> itensPendentes = new ArrayList<>();
+    private final ObservableList<String> nomesItensPendentes = FXCollections.observableArrayList();
 
     @FXML
     public void initialize() {
@@ -48,10 +57,13 @@ public class AlugueisController {
         configurarAcessoPorCargo();
         configurarTabela();
         carregarAlugueis();
-        configurarListeners();
+        listaItensSelecionados.setItems(nomesItensPendentes);
     }
 
+    // ─── Configuração dos combos ────────────────────────────────────────────
+
     private void configurarCombos() {
+        // Combo cliente
         comboCliente.setItems(FXCollections.observableArrayList(facade.listarClientes()));
         comboCliente.setButtonCell(new ListCell<>() {
             @Override protected void updateItem(Cliente c, boolean empty) {
@@ -66,6 +78,7 @@ public class AlugueisController {
             }
         });
 
+        // Combo livro
         comboLivro.setItems(FXCollections.observableArrayList(facade.listarLivros()));
         comboLivro.setButtonCell(new ListCell<>() {
             @Override protected void updateItem(Livro l, boolean empty) {
@@ -76,10 +89,12 @@ public class AlugueisController {
         comboLivro.setCellFactory(lv -> new ListCell<>() {
             @Override protected void updateItem(Livro l, boolean empty) {
                 super.updateItem(l, empty);
-                setText(l == null || empty ? "" : l.getTitulo() + " — R$ " + l.getValorAluguel());
+                setText(l == null || empty ? "" : l.getTitulo()
+                        + " (" + l.getExemplares() + " disp.) — R$ " + l.getValorAluguel());
             }
         });
 
+        // Combo disco
         comboDisco.setItems(FXCollections.observableArrayList(facade.listarDiscos()));
         comboDisco.setButtonCell(new ListCell<>() {
             @Override protected void updateItem(Disco d, boolean empty) {
@@ -90,33 +105,137 @@ public class AlugueisController {
         comboDisco.setCellFactory(lv -> new ListCell<>() {
             @Override protected void updateItem(Disco d, boolean empty) {
                 super.updateItem(d, empty);
-                setText(d == null || empty ? "" : d.getTitulo() + " — R$ " + d.getValorAluguel());
+                setText(d == null || empty ? "" : d.getTitulo()
+                        + " (" + d.getExemplares() + " disp.) — R$ " + d.getValorAluguel());
             }
         });
 
         dataEmprestimo.setValue(LocalDate.now());
     }
 
-    private void configurarListeners() {
-        comboLivro.setOnAction(e -> atualizarValorTotal());
-        comboDisco.setOnAction(e -> atualizarValorTotal());
-        // Limpar seleção mutuamente exclusiva (um livro OU um disco por vez)
-        comboLivro.setOnAction(e -> {
-            if (comboLivro.getValue() != null) comboDisco.getSelectionModel().clearSelection();
-            atualizarValorTotal();
-        });
-        comboDisco.setOnAction(e -> {
-            if (comboDisco.getValue() != null) comboLivro.getSelectionModel().clearSelection();
-            atualizarValorTotal();
-        });
+    // ─── Adicionar item à lista pendente ───────────────────────────────────
+
+    @FXML
+    public void handleAdicionarItem() {
+        labelErroForm.setText("");
+        Livro livro = comboLivro.getValue();
+        Disco disco = comboDisco.getValue();
+
+        if (livro == null && disco == null) {
+            labelErroForm.setText("Selecione um livro ou disco para adicionar.");
+            return;
+        }
+
+        // Adiciona livro se selecionado
+        if (livro != null) {
+            if (livro.getExemplares() <= 0) {
+                labelErroForm.setText("Livro \"" + livro.getTitulo() + "\" sem exemplares disponíveis.");
+                return;
+            }
+            // Verifica se já está na lista
+            if (itensPendentes.contains(livro)) {
+                labelErroForm.setText("\"" + livro.getTitulo() + "\" já está na lista.");
+                return;
+            }
+            itensPendentes.add(livro);
+            nomesItensPendentes.add("📖 " + livro.getTitulo()
+                    + " — R$ " + String.format("%.2f", livro.getValorAluguel()));
+            comboLivro.getSelectionModel().clearSelection();
+        }
+
+        // Adiciona disco se selecionado (pode adicionar junto com livro)
+        if (disco != null) {
+            if (disco.getExemplares() <= 0) {
+                labelErroForm.setText("Disco \"" + disco.getTitulo() + "\" sem exemplares disponíveis.");
+                return;
+            }
+            if (itensPendentes.contains(disco)) {
+                labelErroForm.setText("\"" + disco.getTitulo() + "\" já está na lista.");
+                return;
+            }
+            itensPendentes.add(disco);
+            nomesItensPendentes.add("🎵 " + disco.getTitulo()
+                    + " — R$ " + String.format("%.2f", disco.getValorAluguel()));
+            comboDisco.getSelectionModel().clearSelection();
+        }
+
+        atualizarValorTotal();
+        atualizarVisibilidadeLista();
+    }
+
+    @FXML
+    public void handleLimparLista() {
+        itensPendentes.clear();
+        nomesItensPendentes.clear();
+        atualizarValorTotal();
+        atualizarVisibilidadeLista();
+        labelErroForm.setText("");
     }
 
     private void atualizarValorTotal() {
-        float total = 0;
-        if (comboLivro.getValue() != null) total += comboLivro.getValue().getValorAluguel();
-        if (comboDisco.getValue() != null) total += comboDisco.getValue().getValorAluguel();
+        float total = (float) itensPendentes.stream()
+                .mapToDouble(Produto::getValorAluguel).sum();
         labelValorTotal.setText(String.format("R$ %.2f", total));
     }
+
+    private void atualizarVisibilidadeLista() {
+        boolean temItens = !itensPendentes.isEmpty();
+        boxItensSelecionados.setVisible(temItens);
+        boxItensSelecionados.setManaged(temItens);
+    }
+
+    // ─── Registrar aluguel com todos os itens pendentes ────────────────────
+
+    @FXML
+    public void handleNovoAluguel() {
+        labelErroForm.setText("");
+        try {
+            Cliente cliente = comboCliente.getValue();
+            LocalDate inicio = dataEmprestimo.getValue();
+
+            if (cliente == null) {
+                labelErroForm.setText("Selecione um cliente.");
+                return;
+            }
+            if (itensPendentes.isEmpty()) {
+                labelErroForm.setText("Adicione ao menos um livro ou disco à lista.");
+                return;
+            }
+            if (inicio == null) {
+                labelErroForm.setText("Informe a data de início.");
+                return;
+            }
+
+            // Cria o aluguel com o primeiro produto e adiciona os demais
+            Aluguel aluguel = new Aluguel(cliente, itensPendentes.get(0), inicio);
+
+            if (dataDevolucao.getValue() != null) {
+                aluguel.setDataDevolucao(dataDevolucao.getValue());
+            }
+
+            // Adiciona os produtos restantes (a partir do índice 1)
+            for (int i = 1; i < itensPendentes.size(); i++) {
+                aluguel.adicionarProduto(itensPendentes.get(i));
+            }
+
+            facade.registrarAluguel(aluguel);
+
+            // Limpa tudo
+            comboCliente.getSelectionModel().clearSelection();
+            dataEmprestimo.setValue(LocalDate.now());
+            dataDevolucao.setValue(null);
+            handleLimparLista();
+            carregarAlugueis();
+
+        } catch (ProdutoIndisponivelException e) {
+            labelErroForm.setText("Produto indisponível: \""
+                    + e.getTituloProduto() + "\" — sem exemplares.");
+        } catch (Exception e) {
+            labelErroForm.setText("Erro: " + e.getMessage());
+        }
+    }
+
+    // ─── Tabela ────────────────────────────────────────────────────────────
 
     private void configurarTabela() {
         colCliente.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().nomeCliente));
@@ -132,8 +251,8 @@ public class AlugueisController {
                 setText(item);
                 if (item.startsWith("Atrasado")) {
                     setStyle("-fx-text-fill: #cc0000; -fx-font-weight: bold;");
-                } else if (item.equals("Finalizado")) {
-                    setStyle("-fx-text-fill: #808080; -fx-font-weight: normal;");
+                } else if ("Finalizado".equals(item)) {
+                    setStyle("-fx-text-fill: #808080;");
                 } else {
                     setStyle("-fx-text-fill: #228B22; -fx-font-weight: bold;");
                 }
@@ -142,90 +261,50 @@ public class AlugueisController {
     }
 
     private void carregarAlugueis() {
-        List<Aluguel> alugueis = facade.listarAlugueis();
-        java.util.List<LinhaAluguel> linhas = new java.util.ArrayList<>();
-
-        for (Aluguel a : alugueis) {
+        List<LinhaAluguel> linhas = new ArrayList<>();
+        for (Aluguel a : facade.listarAlugueis()) {
             String nomeCliente = a.getCliente() != null ? a.getCliente().getNome() : "—";
             String inicio = a.getDataEmprestimo() != null ? a.getDataEmprestimo().format(FMT) : "—";
-            String fim = a.getDataDevolucao() != null ? a.getDataDevolucao().format(FMT) : "—";
-            String datas = inicio + " - " + fim;
+            String fim    = a.getDataDevolucao()  != null ? a.getDataDevolucao().format(FMT)  : "—";
+            String datas  = inicio + " - " + fim;
 
             String status = a.getStatus();
-            if (status.equals("Ativo") && a.getDataDevolucao() != null) {
-                long diasAtraso = java.time.temporal.ChronoUnit.DAYS.between(a.getDataDevolucao(), LocalDate.now());
-                if (diasAtraso > 0) status = "Atrasado (" + diasAtraso + " dias)";
+            if ("Ativo".equals(status) && a.getDataDevolucao() != null) {
+                long atraso = java.time.temporal.ChronoUnit.DAYS
+                        .between(a.getDataDevolucao(), LocalDate.now());
+                if (atraso > 0) status = "Atrasado (" + atraso + " dias)";
             }
 
             for (Produto p : a.getProdutos()) {
-                String tipo = p.getClass().getSimpleName();
-                linhas.add(new LinhaAluguel(nomeCliente, tipo, p.getDescricao().split("\\|")[0].trim(), datas, status));
+                String tipo   = (p instanceof Livro) ? "Livro" : "Disco";
+                String titulo = p.getTitulo();
+                linhas.add(new LinhaAluguel(nomeCliente, tipo, titulo, datas, status));
             }
         }
-
         tabelaAlugueis.setItems(FXCollections.observableArrayList(linhas));
     }
 
-    @FXML
-    public void handleNovoAluguel() {
-        labelErroForm.setText("");
-        try {
-            Cliente cliente = comboCliente.getValue();
-            Livro livro = comboLivro.getValue();
-            Disco disco = comboDisco.getValue();
-            LocalDate inicio = dataEmprestimo.getValue();
-
-            if (cliente == null) { labelErroForm.setText("Selecione um cliente."); return; }
-            if (livro == null && disco == null) { labelErroForm.setText("Selecione um livro ou disco."); return; }
-            if (inicio == null) { labelErroForm.setText("Informe a data de início."); return; }
-
-            Produto produto = livro != null ? livro : disco;
-            Aluguel aluguel = new Aluguel(cliente, produto, inicio);
-
-            if (dataDevolucao.getValue() != null) {
-                aluguel.setDataDevolucao(dataDevolucao.getValue());
-            }
-
-            facade.registrarAluguel(aluguel);
-
-            // Limpar formulário
-            comboCliente.getSelectionModel().clearSelection();
-            comboLivro.getSelectionModel().clearSelection();
-            comboDisco.getSelectionModel().clearSelection();
-            dataEmprestimo.setValue(LocalDate.now());
-            dataDevolucao.setValue(null);
-            labelValorTotal.setText("R$ 0,00");
-
-            carregarAlugueis();
-
-        } catch (ProdutoIndisponivelException e) {
-            labelErroForm.setText("Produto indisponível: " + e.getTituloProduto() +
-                                  " — não há exemplares disponíveis para aluguel.");
-        } catch (Exception e) {
-            labelErroForm.setText("Erro: " + e.getMessage());
-        }
-    }
+    // ─── Devolução ─────────────────────────────────────────────────────────
 
     @FXML
     public void handleDevolucao() {
         LinhaAluguel selecionada = tabelaAlugueis.getSelectionModel().getSelectedItem();
         if (selecionada == null) {
-            labelErro.setText("Selecione um aluguel na tabela para registrar devolução.");
+            labelErro.setText("Selecione uma linha na tabela para registrar a devolução.");
             return;
         }
-        if (selecionada.status.equals("Finalizado")) {
+        if ("Finalizado".equals(selecionada.status)) {
             labelErro.setText("Este aluguel já foi finalizado.");
             return;
         }
 
-        // Busca o aluguel correspondente e finaliza
-        List<Aluguel> alugueis = facade.listarAlugueis();
-        for (Aluguel a : alugueis) {
-            // Verifica se o aluguel bate com o cliente e título selecionado e ainda está Ativo
-            boolean mesmoCliente = a.getCliente() != null && a.getCliente().getNome().equals(selecionada.nomeCliente);
-            boolean mesmoProduto = a.getProdutos().stream().anyMatch(p -> p.getDescricao().contains(selecionada.titulo));
+        for (Aluguel a : facade.listarAlugueis()) {
+            boolean mesmoCliente = a.getCliente() != null
+                    && a.getCliente().getNome().equals(selecionada.nomeCliente);
+            boolean mesmoProduto = a.getProdutos().stream()
+                    .anyMatch(p -> p.getTitulo().equals(selecionada.titulo));
 
-            if (mesmoCliente && mesmoProduto && !a.getStatus().equals("Finalizado")) {
+            if (mesmoCliente && mesmoProduto && !"Finalizado".equals(a.getStatus())) {
                 try {
                     facade.finalizarAluguel(a, LocalDate.now());
                     labelErro.setText("");
@@ -233,37 +312,49 @@ public class AlugueisController {
                     return;
                 } catch (Exception e) {
                     labelErro.setText("Erro: " + e.getMessage());
+                    return;
                 }
             }
         }
-        labelErro.setText("Aluguel ativo não encontrado.");
+        labelErro.setText("Aluguel ativo não encontrado para devolução.");
     }
 
-    // Classe auxiliar para linhas da tabela
+    // ─── Classe auxiliar ───────────────────────────────────────────────────
+
     public static class LinhaAluguel {
         public final String nomeCliente, tipo, titulo, datas, status;
-        public LinhaAluguel(String nomeCliente, String tipo, String titulo, String datas, String status) {
-            this.nomeCliente = nomeCliente; this.tipo = tipo;
-            this.titulo = titulo; this.datas = datas; this.status = status;
+        public LinhaAluguel(String nomeCliente, String tipo, String titulo,
+                            String datas, String status) {
+            this.nomeCliente = nomeCliente;
+            this.tipo        = tipo;
+            this.titulo      = titulo;
+            this.datas       = datas;
+            this.status      = status;
         }
     }
 
-    @FXML public void abrirLivros() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaLivros.fxml", "Duduteca - Livros"); }
-    @FXML public void abrirDiscos() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaDiscos.fxml", "Duduteca - Discos"); }
-    @FXML public void abrirClientes() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaClientes.fxml", "Duduteca - Clientes"); }
-    @FXML public void abrirAlugueis() { /* já estamos aqui */ }
-    @FXML public void abrirDashboard() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaDashboard.fxml", "Duduteca - Dashboard"); }
-    @FXML public void abrirRelatorio() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaRelatorio.fxml", "Duduteca - Relatório"); }
+    // ─── Navegação ─────────────────────────────────────────────────────────
+
+    @FXML public void abrirLivros()    { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaLivros.fxml",        "Duduteca - Livros"); }
+    @FXML public void abrirDiscos()    { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaDiscos.fxml",        "Duduteca - Discos"); }
+    @FXML public void abrirClientes()  { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaClientes.fxml",      "Duduteca - Clientes"); }
+    @FXML public void abrirAlugueis()  { /* já estamos aqui */ }
+    @FXML public void abrirDashboard() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaDashboard.fxml",     "Duduteca - Dashboard"); }
+    @FXML public void abrirRelatorio() { navegar("/br/edu/ufersa/LEVI/view/fxml/TelaRelatorio.fxml",     "Duduteca - Relatório"); }
     @FXML public void abrirFuncionarios() {
         if (!SessaoUsuario.isGerente()) return;
         navegar("/br/edu/ufersa/LEVI/view/fxml/TelaFuncionarios.fxml", "Duduteca - Funcionários");
     }
-    @FXML public void handleSair() { SessaoUsuario.encerrarSessao(); navegar("/br/edu/ufersa/LEVI/view/fxml/TelaLogin.fxml", "Duduteca - Login"); }
+    @FXML public void handleSair() {
+        SessaoUsuario.encerrarSessao();
+        navegar("/br/edu/ufersa/LEVI/view/fxml/TelaLogin.fxml", "Duduteca - Login");
+    }
 
     private void navegar(String fxml, String titulo) {
         try { App.trocarTela(fxml, titulo); }
         catch (IOException e) { labelErro.setText("Tela não implementada: " + fxml); }
     }
+
     private void configurarAcessoPorCargo() {
         if (botaoFuncionarios != null) {
             boolean gerente = SessaoUsuario.isGerente();
@@ -271,5 +362,4 @@ public class AlugueisController {
             botaoFuncionarios.setManaged(gerente);
         }
     }
-
 }
