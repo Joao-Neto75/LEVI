@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane prefHeight="650.0" prefWidth="1000.0"
+            stylesheets="@../css/duduteca.css"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="br.edu.ufersa.LEVI.view.Controller.DiscosController">
+
+    <left>
+        <VBox styleClass="sidebar" spacing="0">
+            <padding><Insets top="30" right="20" bottom="30" left="24"/></padding>
+            <children>
+                <Button onAction="#abrirDashboard" styleClass="sidebar-btn"
+                        style="-fx-padding: 0; -fx-background-color: transparent;">
+                    <graphic><Label text="DUDUTECA" styleClass="sidebar-title"/></graphic>
+                    <VBox.margin><Insets bottom="36"/></VBox.margin>
+                </Button>
+                <Button text="Livros" styleClass="sidebar-btn" onAction="#abrirLivros" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
+                        <image><Image url="@../icons/livro.png"/></image>
+                    </ImageView></graphic>
+                    <VBox.margin><Insets bottom="24"/></VBox.margin>
+                </Button>
+                <Button text="Discos" styleClass="sidebar-btn, sidebar-btn-active" onAction="#abrirDiscos" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
+                        <image><Image url="@../icons/disco.png"/></image>
+                    </ImageView></graphic>
+                    <VBox.margin><Insets bottom="24"/></VBox.margin>
+                </Button>
+                <Button text="Clientes" styleClass="sidebar-btn" onAction="#abrirClientes" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
+                        <image><Image url="@../icons/cliente.png"/></image>
+                    </ImageView></graphic>
+                    <VBox.margin><Insets bottom="24"/></VBox.margin>
+                </Button>
+                <Button text="Alugueis" styleClass="sidebar-btn" onAction="#abrirAlugueis" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
+                        <image><Image url="@../icons/aluguel.png"/></image>
+                    </ImageView></graphic>
+                    <VBox.margin><Insets bottom="24"/></VBox.margin>
+                </Button>
+                <Button text="Relatório" styleClass="sidebar-btn" onAction="#abrirRelatorio" maxWidth="Infinity">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
+                        <image><Image url="@../icons/relatorio.png"/></image>
+                    </ImageView></graphic>
+                    <VBox.margin><Insets bottom="24"/></VBox.margin>
+                </Button>
+                <Button fx:id="botaoFuncionarios" text="Funcionários" styleClass="sidebar-btn"
+                        onAction="#abrirFuncionarios" maxWidth="Infinity"
+                        visible="false" managed="false">
+                    <graphic><ImageView fitWidth="30" fitHeight="30" preserveRatio="true">
+                        <image><Image url="@../icons/cliente.png"/></image>
+                    </ImageView></graphic>
+                </Button>
+                <Region VBox.vgrow="ALWAYS"/>
+                <Button text="Sair" styleClass="sidebar-sair" onAction="#handleSair" maxWidth="Infinity"/>
+            </children>
+        </VBox>
+    </left>
+
+    <center>
+        <VBox spacing="16.0">
+            <padding><Insets top="30" right="35" bottom="30" left="35"/></padding>
+            <children>
+                <Label text="Gerenciamento de Discos" styleClass="page-title"/>
+
+                <HBox spacing="12" alignment="CENTER_LEFT" styleClass="search-bar">
+                    <children>
+                        <Label text="Título:" style="-fx-font-size:13px;"/>
+                        <TextField fx:id="campoBuscaTitulo" promptText="Nome..." prefWidth="180" styleClass="search-field"/>
+                        <Label text="Banda:" style="-fx-font-size:13px;"/>
+                        <TextField fx:id="campoBuscaBanda" promptText="Digite..." prefWidth="160" styleClass="search-field"/>
+                        <Label text="Estilo:" style="-fx-font-size:13px;"/>
+                        <ComboBox fx:id="comboEstilo" promptText="Estilo" prefWidth="130"/>
+                        <Button text="🔍 Buscar" styleClass="search-btn" onAction="#handleBuscar"/>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Button text="Adicionar Disco +" styleClass="btn-primary" onAction="#handleAdicionar"/>
+                    </children>
+                </HBox>
+
+                <Label fx:id="labelErro" styleClass="error-label"/>
+
+                <VBox fx:id="painelFormulario" spacing="10" visible="false" managed="false"
+                      style="-fx-background-color: white; -fx-background-radius: 10; -fx-border-color: #E0D5C8; -fx-border-radius: 10;">
+                    <padding><Insets top="16" right="20" bottom="16" left="20"/></padding>
+                    <children>
+                        <Label fx:id="labelTituloForm" text="Adicionar Disco" style="-fx-font-size:16px; -fx-font-weight:bold;"/>
+                        <HBox spacing="16" alignment="CENTER_LEFT">
+                            <children>
+                                <VBox spacing="4"><children><Label text="Título" style="-fx-font-size:12px;"/><TextField fx:id="fieldTitulo" prefWidth="180" styleClass="search-field"/></children></VBox>
+                                <VBox spacing="4"><children><Label text="Banda/Cantor" style="-fx-font-size:12px;"/><TextField fx:id="fieldBanda" prefWidth="160" styleClass="search-field"/></children></VBox>
+                                <VBox spacing="4"><children><Label text="Estilo" style="-fx-font-size:12px;"/><TextField fx:id="fieldEstilo" prefWidth="120" styleClass="search-field"/></children></VBox>
+                                <VBox spacing="4"><children><Label text="Ano (AAAA-MM-DD)" style="-fx-font-size:12px;"/><TextField fx:id="fieldAno" prefWidth="120" styleClass="search-field"/></children></VBox>
+                                <VBox spacing="4"><children><Label text="Exemplares" style="-fx-font-size:12px;"/><TextField fx:id="fieldExemplares" prefWidth="80" styleClass="search-field"/></children></VBox>
+                                <VBox spacing="4"><children><Label text="Valor (R$)" style="-fx-font-size:12px;"/><TextField fx:id="fieldValor" prefWidth="80" styleClass="search-field"/></children></VBox>
+                            </children>
+                        </HBox>
+                        <Label fx:id="labelErroForm" styleClass="error-label"/>
+                        <HBox spacing="10">
+                            <children>
+                                <Button text="Salvar" styleClass="btn-primary" onAction="#handleSalvar"/>
+                                <Button text="Cancelar" styleClass="search-btn" onAction="#handleCancelar"/>
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+
+                <TableView fx:id="tabelaDiscos" VBox.vgrow="ALWAYS" maxHeight="Infinity" maxWidth="Infinity" styleClass="table-view">
+                    <columns>
+                        <TableColumn fx:id="colBanda"      text="Banda/Cantor"    prefWidth="160" minWidth="100"/>
+                        <TableColumn fx:id="colTitulo"     text="Título"           prefWidth="180" minWidth="110"/>
+                        <TableColumn fx:id="colEstilo"     text="Estilo"           prefWidth="120" minWidth="80"/>
+                        <TableColumn fx:id="colExemplares" text="Exemplares"       prefWidth="90"  minWidth="70"/>
+                        <TableColumn fx:id="colAno"        text="Ano"              prefWidth="70"  minWidth="50"/>
+                        <TableColumn fx:id="colValor"      text="Valor de Aluguel" prefWidth="120" minWidth="90"/>
+                        <TableColumn fx:id="colAcoes"      text="Ações"            prefWidth="80"  minWidth="60"/>
+                    </columns>
+                    <columnResizePolicy>
+                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY"/>
+                    </columnResizePolicy>
+                </TableView>
+            </children>
+        </VBox>
+    </center>
+</BorderPane>
