@@ -76,6 +76,8 @@
                         <ComboBox fx:id="comboGenero" promptText="Gênero" prefWidth="140"/>
                         <Label text="Autor:" style="-fx-font-size:13px;"/>
                         <TextField fx:id="campoBuscaAutor" promptText="Nome..." prefWidth="160" styleClass="search-field"/>
+                        <Label text="Ano:" style="-fx-font-size:13px;"/>
+                        <TextField fx:id="campoBuscaAno" promptText="Ex: 1997" prefWidth="80" styleClass="search-field"/>
                         <Button text="🔍 Buscar" styleClass="search-btn" onAction="#handleBuscar"/>
                         <Region HBox.hgrow="ALWAYS"/>
                         <Button text="Adicionar Livro +" styleClass="btn-primary" onAction="#handleAdicionar"/>

@@ -27,6 +27,7 @@ public class LivrosController {
     // Filtros
     @FXML private TextField campoBuscaTitulo;
     @FXML private TextField campoBuscaAutor;
+    @FXML private TextField campoBuscaAno;
     @FXML private ComboBox<String> comboGenero;
     @FXML private Label labelErro;
 
@@ -124,10 +125,12 @@ public class LivrosController {
 
         List<Livro> todos = facade.listarLivros();
 
+        String ano = campoBuscaAno != null ? campoBuscaAno.getText().trim() : "";
         List<Livro> filtrados = todos.stream()
                 .filter(l -> titulo.isEmpty() || l.getTitulo().toLowerCase().contains(titulo.toLowerCase()))
                 .filter(l -> autor.isEmpty() || l.getAutor().toLowerCase().contains(autor.toLowerCase()))
                 .filter(l -> genero == null || genero.equals("Todos") || l.getGenero().equalsIgnoreCase(genero))
+                .filter(l -> ano.isEmpty() || (l.getAno() != null && String.valueOf(l.getAno().getYear()).contains(ano)))
                 .toList();
 
         carregarLivros(filtrados);
@@ -174,6 +177,7 @@ public class LivrosController {
                 livroEmEdicao.setTitulo(titulo);
                 livroEmEdicao.setAutor(autor);
                 livroEmEdicao.setGenero(genero);
+                livroEmEdicao.setAno(ano);
                 livroEmEdicao.setPaginas(paginas);
                 livroEmEdicao.setExemplares(exemplares);
                 livroEmEdicao.setValorAluguel(valor);

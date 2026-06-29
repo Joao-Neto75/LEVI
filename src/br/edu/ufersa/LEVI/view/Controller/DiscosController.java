@@ -145,6 +145,7 @@ public class DiscosController {
                 discoEmEdicao.setTitulo(titulo);
                 discoEmEdicao.setBanda(banda);
                 discoEmEdicao.setEstilo(estilo);
+                discoEmEdicao.setAno(ano);
                 discoEmEdicao.setExemplares(exemplares);
                 discoEmEdicao.setValorAluguel(valor);
                 facade.atualizarDisco(discoEmEdicao);
