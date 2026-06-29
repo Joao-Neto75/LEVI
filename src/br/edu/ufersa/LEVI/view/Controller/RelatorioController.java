@@ -243,10 +243,8 @@ public class RelatorioController {
             return;
         }
 
-        float faturamentoPeriodo = 0;
-        for (LinhaRelatorio linha : ultimasLinhasGeradas) {
-            faturamentoPeriodo += linha.getValor();
-        }
+        // Usa o mesmo cálculo do card da tela (soma valorTotal dos alugueis)
+        float faturamentoPeriodo = facade.calcularFaturamentoMes(mesSelecionado, anoSelecionado);
 
         try {
             File arquivo = geradorPdf.gerar(ultimoTituloGerado, ultimoSubtituloGerado,
