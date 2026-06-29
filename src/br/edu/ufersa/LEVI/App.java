@@ -24,8 +24,8 @@ public class App extends Application {
         FXMLLoader loader = new FXMLLoader(App.class.getResource(caminhoFxml));
         Parent root = loader.load();
 
-        double largura = stagePrincipal.getScene() != null ? stagePrincipal.getScene().getWidth() : 1000;
-        double altura = stagePrincipal.getScene() != null ? stagePrincipal.getScene().getHeight() : 650;
+        double largura = stagePrincipal.getScene() != null ? stagePrincipal.getScene().getWidth() : 1920;
+        double altura = stagePrincipal.getScene() != null ? stagePrincipal.getScene().getHeight() : 1080;
 
         Scene scene = new Scene(root, largura, altura);
         stagePrincipal.setScene(scene);
